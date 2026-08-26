@@ -1,0 +1,531 @@
+// ============================================
+// COMPLIANCE ACTIVITY - AURORA MIDNIGHT THEME
+// ============================================
+
+function doGet() {
+  return HtmlService.createTemplateFromFile('index')
+    .evaluate()
+    .setTitle('Compliance Activity')
+    .addMetaTag('viewport', 'width=device-width, initial-scale=1')
+    .setXFrameOptionsMode(HtmlService.XFrameOptionsMode.ALLOWALL);
+}
+
+function include(filename) {
+  return HtmlService.createHtmlOutputFromFile(filename).getContent();
+}
+
+function getUsersSheet() {
+  // Ganti dengan ID spreadsheet baru Anda
+  var ss = SpreadsheetApp.openById('1n7Ov-sVWSpACa2nTkKgu-MdvZddyKzl90iTEQkNR2-s/edit?gid=0#gid=0');
+  return ss.getSheetByName('PIC Setup');
+}
+
+function generatePassword(length = 10) {
+  var chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$';
+  var password = '';
+  for (var i = 0; i < length; i++) {
+    password += chars.charAt(Math.floor(Math.random() * chars.length));
+  }
+  return password;
+}
+
+function getAppUrl() {
+  return ScriptApp.getService().getUrl();
+}
+
+// ============================================
+// 1. AUTHENTICATION
+// ============================================
+
+function loginUser(identifier, password) {
+  try {
+    var sheet = getUsersSheet();
+    if (!sheet) return { success: false, message: 'Database tidak ditemukan' };
+    
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) return { success: false, message: 'Belum ada user terdaftar' };
+    
+    var headers = data[0];
+    var userCol = headers.indexOf('Username');
+    var emailCol = headers.indexOf('Email');
+    var passCol = headers.indexOf('Password');
+    var statusCol = headers.indexOf('Status');
+    var nameCol = headers.indexOf('Nama Lengkap');
+    var roleCol = headers.indexOf('Role');
+    var photoCol = headers.indexOf('Foto Profil');
+    
+    var cleanInput = identifier.toString().trim().toLowerCase();
+    
+    for (var i = 1; i < data.length; i++) {
+      var rowUsername = userCol != -1 && data[i][userCol] ? data[i][userCol].toString().trim().toLowerCase() : '';
+      var rowEmail = emailCol != -1 && data[i][emailCol] ? data[i][emailCol].toString().trim().toLowerCase() : '';
+      
+      if (rowUsername === cleanInput || rowEmail === cleanInput) {
+        var status = statusCol != -1 && data[i][statusCol] ? data[i][statusCol].toString() : '';
+        
+        if (status !== 'Aktif' && status !== 'Active') {
+          return { 
+            success: false, 
+            message: 'inactive',
+            supportEmail: 'support_compliance@gmail.com',
+            username: data[i][userCol]
+          };
+        }
+        
+        var storedPass = passCol != -1 && data[i][passCol] ? data[i][passCol].toString() : '';
+        if (storedPass !== password) {
+          return { success: false, message: 'Password salah' };
+        }
+        
+        var user = {
+          name: nameCol != -1 && data[i][nameCol] ? data[i][nameCol] : 'User',
+          username: rowUsername,
+          email: rowEmail,
+          role: roleCol != -1 && data[i][roleCol] ? data[i][roleCol] : 'PIC',
+          photo: photoCol != -1 && data[i][photoCol] ? data[i][photoCol] : '',
+          rowIndex: i + 1
+        };
+        
+        PropertiesService.getUserProperties().setProperty('currentUser', JSON.stringify(user));
+        return { success: true, user: user };
+      }
+    }
+    
+    return { success: false, message: 'Username atau Email tidak ditemukan' };
+  } catch (e) {
+    return { success: false, message: 'System error: ' + e.toString() };
+  }
+}
+
+function logoutUser() {
+  PropertiesService.getUserProperties().deleteProperty('currentUser');
+  return { success: true };
+}
+
+function validateSession() {
+  var user = PropertiesService.getUserProperties().getProperty('currentUser');
+  if (!user) throw new Error('Unauthorized');
+  return JSON.parse(user);
+}
+
+// ============================================
+// 2. EMAIL NOTIFICATIONS
+// ============================================
+
+function sendWelcomeEmail(email, name, username, password) {
+  try {
+    var subject = 'Akun Compliance Activity Telah Dibuat';
+    var htmlBody = `
+      <div style="font-family: Arial, sans-serif; color: #333; line-height: 1.6;">
+        <h2 style="color: #00d4aa;">Selamat Datang di Compliance Activity</h2>
+        <p>Halo <strong>${name}</strong>,</p>
+        <p>Akun Anda telah berhasil dibuat. Berikut detail login Anda:</p>
+        <table style="border-collapse: collapse; margin: 20px 0; width: 100%; max-width: 400px;">
+          <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Username:</strong></td><td style="padding: 10px; border: 1px solid #ddd;">${username}</td></tr>
+          <tr><td style="padding: 10px; border: 1px solid #ddd; background: #f9f9f9;"><strong>Password:</strong></td><td style="padding: 10px; border: 1px solid #ddd; color: #d32f2f; font-weight: bold;">${password}</td></tr>
+        </table>
+        <p>Link Login: <a href="${getAppUrl()}" style="color: #00d4aa;">${getAppUrl()}</a></p>
+        <br>
+        <p>Salam,<br>Tim Compliance Activity</p>
+      </div>
+    `;
+    MailApp.sendEmail({ to: email, subject: subject, htmlBody: htmlBody });
+    return true;
+  } catch (e) {
+    Logger.log('Email error: ' + e.toString());
+    return false;
+  }
+}
+
+function sendSupportEmail(userIdentifier, issue) {
+  try {
+    var subject = 'Bantuan Login - User: ' + userIdentifier;
+    var body = `Permintaan bantuan dari user.\n\nUsername/Email: ${userIdentifier}\nMasalah: ${issue}\nWaktu: ${new Date().toLocaleString()}`;
+    MailApp.sendEmail('support_compliance@gmail.com', subject, body);
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+// ============================================
+// 3. USER MANAGEMENT CRUD
+// ============================================
+
+function getAllUsers() {
+  try {
+    var sheet = getUsersSheet();
+    var data = sheet.getDataRange().getValues();
+    if (data.length <= 1) return { success: true, users: [] };
+    
+    var headers = data[0];
+    var users = [];
+    for (var i = 1; i < data.length; i++) {
+      var user = { rowIndex: i + 1 };
+      for (var j = 0; j < headers.length; j++) {
+        var val = data[i][j];
+        if (val instanceof Date) {
+          user[headers[j]] = Utilities.formatDate(val, Session.getScriptTimeZone(), "dd MMM yyyy");
+        } else {
+          user[headers[j]] = val;
+        }
+      }
+      users.push(user);
+    }
+    return { success: true, users: users };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function createUser(userData) {
+  try {
+    var currentUser = validateSession();
+    if (currentUser.role !== 'Superadmin') return { success: false, message: 'Akses ditolak' };
+    
+    var sheet = getUsersSheet();
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    
+    var userCol = headers.indexOf('Username');
+    var emailCol = headers.indexOf('Email');
+    for (var i = 1; i < data.length; i++) {
+      if (data[i][userCol].toString().toLowerCase() === userData.Username.toLowerCase()) {
+        return { success: false, message: 'Username sudah digunakan!' };
+      }
+      if (data[i][emailCol].toString().toLowerCase() === userData.Email.toLowerCase()) {
+        return { success: false, message: 'Email sudah terdaftar!' };
+      }
+    }
+    
+    var newPassword = generatePassword(10);
+    var today = Utilities.formatDate(new Date(), Session.getScriptTimeZone(), "dd MMM yyyy");
+    
+    // Urutan kolom sesuai sheet: Nama, Username, Email, Password, No Telp, Telegram, Role, Status, Foto, Tanggal
+    var newRow = [
+      userData['Nama Lengkap'],
+      userData.Username,
+      userData.Email,
+      newPassword,
+      userData['No Telepon'] || '',
+      userData['Telegram ID'] || '',
+      userData.Role || 'PIC',
+      userData.Status || 'Aktif',
+      '', // Foto Profil
+      today
+    ];
+    
+    sheet.appendRow(newRow);
+    sendWelcomeEmail(userData.Email, userData['Nama Lengkap'], userData.Username, newPassword);
+    
+    return { success: true, message: 'User berhasil dibuat & email telah dikirim' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function updateUser(rowIndex, userData) {
+  try {
+    var currentUser = validateSession();
+    if (currentUser.role !== 'Superadmin') return { success: false, message: 'Akses ditolak' };
+    
+    var sheet = getUsersSheet();
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    
+    var userCol = headers.indexOf('Username');
+    var emailCol = headers.indexOf('Email');
+    for (var i = 1; i < data.length; i++) {
+      if (i + 1 === rowIndex) continue;
+      if (data[i][userCol].toString().toLowerCase() === userData.Username.toLowerCase()) {
+        return { success: false, message: 'Username sudah digunakan user lain!' };
+      }
+      if (data[i][emailCol].toString().toLowerCase() === userData.Email.toLowerCase()) {
+        return { success: false, message: 'Email sudah digunakan user lain!' };
+      }
+    }
+    
+    var updateMap = {
+      'Nama Lengkap': userData['Nama Lengkap'],
+      'Username': userData.Username,
+      'Email': userData.Email,
+      'No Telepon': userData['No Telepon'],
+      'Telegram ID': userData['Telegram ID'],
+      'Role': userData.Role,
+      'Status': userData.Status
+    };
+    
+    for (var key in updateMap) {
+      var colIndex = headers.indexOf(key);
+      if (colIndex !== -1) {
+        sheet.getRange(rowIndex, colIndex + 1).setValue(updateMap[key]);
+      }
+    }
+    
+    return { success: true, message: 'User berhasil diupdate' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function deleteUser(rowIndex) {
+  try {
+    var currentUser = validateSession();
+    if (currentUser.role !== 'Superadmin') return { success: false, message: 'Akses ditolak' };
+    
+    var sheet = getUsersSheet();
+    if (rowIndex < 2 || rowIndex > sheet.getLastRow()) {
+      return { success: false, message: 'Row tidak valid' };
+    }
+    
+    sheet.deleteRow(rowIndex);
+    return { success: true, message: 'User berhasil dihapus' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function resetUserPassword(rowIndex) {
+  try {
+    var currentUser = validateSession();
+    if (currentUser.role !== 'Superadmin') return { success: false, message: 'Akses ditolak' };
+    
+    var sheet = getUsersSheet();
+    var data = sheet.getDataRange().getValues();
+    var headers = data[0];
+    
+    var passCol = headers.indexOf('Password');
+    var emailCol = headers.indexOf('Email');
+    var nameCol = headers.indexOf('Nama Lengkap');
+    var userCol = headers.indexOf('Username');
+    
+    var newPassword = generatePassword(10);
+    sheet.getRange(rowIndex, passCol + 1).setValue(newPassword);
+    
+    var email = data[rowIndex - 1][emailCol];
+    var name = data[rowIndex - 1][nameCol];
+    var username = data[rowIndex - 1][userCol];
+    
+    sendWelcomeEmail(email, name, username, newPassword);
+    
+    return { success: true, message: 'Password direset & email baru telah dikirim' };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function updateMyProfile(userData, photoUrl) {
+  try {
+    var currentUser = validateSession();
+    var sheet = getUsersSheet();
+    var headers = sheet.getRange(1, 1, 1, sheet.getLastColumn()).getValues()[0];
+    
+    var rowIndex = currentUser.rowIndex;
+    
+    if (userData['Nama Lengkap']) sheet.getRange(rowIndex, headers.indexOf('Nama Lengkap') + 1).setValue(userData['Nama Lengkap']);
+    if (userData['No Telepon']) sheet.getRange(rowIndex, headers.indexOf('No Telepon') + 1).setValue(userData['No Telepon']);
+    if (userData['Telegram ID']) sheet.getRange(rowIndex, headers.indexOf('Telegram ID') + 1).setValue(userData['Telegram ID']);
+    
+    if (photoUrl) {
+      var photoCol = headers.indexOf('Foto Profil');
+      sheet.getRange(rowIndex, photoCol + 1).setValue(photoUrl);
+    }
+    
+    currentUser.name = userData['Nama Lengkap'] || currentUser.name;
+    currentUser.photo = photoUrl || currentUser.photo;
+    PropertiesService.getUserProperties().setProperty('currentUser', JSON.stringify(currentUser));
+    
+    return { success: true, message: 'Profil berhasil diupdate', user: currentUser };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function getMenusByRole(role) {
+  var menus = {
+    'Superadmin': ['Dashboard', 'Task Management', 'Team OKR', 'Repository', 'User Management'],
+    'Manager': ['Dashboard', 'Task Management', 'Team OKR', 'Repository'],
+    'PIC': ['Dashboard', 'Task Management', 'Team OKR'],
+    'Viewer': ['Dashboard']
+  };
+  return menus[role] || ['Dashboard'];
+}
+// ============================================
+// MENU CONFIGURATION MANAGEMENT
+// ============================================
+
+function getMainMenuConfig() {
+  // Default menu configuration
+  return {
+    'main': [
+      { id: 'dashboard', name: 'Dashboard', icon: 'dashboard', order: 1 },
+      { id: 'tasks', name: 'Task Management', icon: 'assignment', order: 2 },
+      { id: 'repository', name: 'Repository', icon: 'folder_shared', order: 3 }
+    ],
+    'reporting': [
+      { id: 'team-okr', name: 'Team OKR', icon: 'trending_up', order: 1 },
+      { id: 'reports', name: 'Reports', icon: 'assessment', order: 2 }
+    ],
+    'configuration': [
+      { id: 'config-menu', name: 'Menu Settings', icon: 'menu_open', order: 1 },
+      { id: 'config-users', name: 'User Management', icon: 'group', order: 2 }
+    ]
+  };
+}
+
+function saveMenuConfig(menuConfig) {
+  try {
+    var currentUser = validateSession();
+    if (currentUser.role !== 'Superadmin') {
+      return { success: false, message: 'Hanya Superadmin yang dapat mengubah menu' };
+    }
+    
+    // Simpan ke Properties Service
+    PropertiesService.getUserProperties().setProperty('menuConfig', JSON.stringify(menuConfig));
+    
+    return { success: true, message: 'Menu berhasil disimpan' };
+  } catch (e) {
+    return { success: false, message: 'Error: ' + e.toString() };
+  }
+}
+
+function getMenuConfig() {
+  try {
+    var config = PropertiesService.getUserProperties().getProperty('menuConfig');
+    if (config) {
+      return { success: true, config: JSON.parse(config) };
+    }
+    return { success: true, config: getMainMenuConfig() };
+  } catch (e) {
+    return { success: false, message: 'Error: ' + e.toString() };
+  }
+}
+
+function getMenusByRole(role) {
+  var config = getMenuConfig();
+  var menuConfig = config.success ? config.config : getMainMenuConfig();
+  
+  var menus = {
+    'Superadmin': {
+      main: menuConfig.main,
+      reporting: menuConfig.reporting,
+      configuration: menuConfig.configuration
+    },
+    'Manager': {
+      main: menuConfig.main.filter(m => m.id !== 'config-users'),
+      reporting: menuConfig.reporting
+    },
+    'PIC': {
+      main: menuConfig.main.filter(m => m.id !== 'repository'),
+      reporting: menuConfig.reporting.filter(m => m.id === 'team-okr')
+    },
+    'Viewer': {
+      main: menuConfig.main.filter(m => m.id === 'dashboard'),
+      reporting: []
+    }
+  };
+  
+  return menus[role] || { main: menuConfig.main.filter(m => m.id === 'dashboard'), reporting: [] };
+}
+
+// ============================================
+// LOGIN IMPROVEMENTS
+// ============================================
+
+function loginUser(identifier, password) {
+  try {
+    var sheet = getUsersSheet();
+    if (!sheet) {
+      return { success: false, message: 'Database tidak ditemukan' };
+    }
+    
+    var data = sheet.getDataRange().getValues();
+    if (data.length < 2) {
+      return { success: false, message: 'Belum ada user terdaftar' };
+    }
+    
+    var headers = data[0];
+    var userCol = headers.indexOf('Username');
+    var emailCol = headers.indexOf('Email');
+    var passCol = headers.indexOf('Password');
+    var statusCol = headers.indexOf('Status');
+    var nameCol = headers.indexOf('Nama Lengkap');
+    var roleCol = headers.indexOf('Role');
+    var photoCol = headers.indexOf('Foto Profil');
+    
+    var cleanInput = identifier.toString().trim().toLowerCase();
+    
+    for (var i = 1; i < data.length; i++) {
+      var row = data[i];
+      var rowUsername = userCol != -1 && row[userCol] ? row[userCol].toString().trim().toLowerCase() : '';
+      var rowEmail = emailCol != -1 && row[emailCol] ? row[emailCol].toString().trim().toLowerCase() : '';
+      
+      if (rowUsername === cleanInput || rowEmail === cleanInput) {
+        var status = statusCol != -1 && row[statusCol] ? row[statusCol].toString() : '';
+        
+        if (status !== 'Aktif' && status !== 'Active') {
+          return { 
+            success: false, 
+            message: 'inactive',
+            supportEmail: 'support_compliance@gmail.com',
+            username: row[userCol]
+          };
+        }
+        
+        var storedPass = passCol != -1 && row[passCol] ? row[passCol].toString() : '';
+        if (storedPass !== password) {
+          return { success: false, message: 'password_wrong' };
+        }
+        
+        var user = {
+          name: nameCol != -1 && row[nameCol] ? row[nameCol] : 'User',
+          username: rowUsername,
+          email: rowEmail,
+          role: roleCol != -1 && row[roleCol] ? row[roleCol] : 'PIC',
+          photo: photoCol != -1 && row[photoCol] ? row[photoCol] : '',
+          rowIndex: i + 1
+        };
+        
+        PropertiesService.getUserProperties().setProperty('currentUser', JSON.stringify(user));
+        return { success: true, user: user };
+      }
+    }
+    
+    return { success: false, message: 'user_not_found' };
+    
+  } catch (e) {
+    Logger.log('Login error: ' + e.toString());
+    return { success: false, message: 'system_error', error: e.toString() };
+  }
+}
+
+// Pastikan fungsi ini ada
+function getUsersSheet() {
+  return SpreadsheetApp.getActiveSpreadsheet().getSheetByName('PIC Setup');
+}
+
+function logoutUser() {
+  try {
+    PropertiesService.getUserProperties().deleteProperty('currentUser');
+    return { success: true };
+  } catch (e) {
+    return { success: false, message: e.toString() };
+  }
+}
+
+function getMenusByRole(role) {
+  return {
+    main: [
+      { id: 'dashboard', name: 'Dashboard', icon: 'dashboard', order: 1 },
+      { id: 'tasks', name: 'Task Management', icon: 'assignment', order: 2 },
+      { id: 'repository', name: 'Repository', icon: 'folder_shared', order: 3 }
+    ],
+    reporting: [
+      { id: 'team-okr', name: 'Team OKR', icon: 'trending_up', order: 1 }
+    ],
+    configuration: role === 'Superadmin' ? [
+      { id: 'config-menu', name: 'Menu Settings', icon: 'settings', order: 1 },
+      { id: 'config-users', name: 'User Management', icon: 'group', order: 2 }
+    ] : []
+  };
+}
