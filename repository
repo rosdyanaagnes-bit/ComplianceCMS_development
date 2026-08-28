@@ -1,0 +1,841 @@
+<!-- POLICY & PROCEDURE PAGE -->
+<div id="page-repo-policy" class="page">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div>
+      <div class="flex items-center gap-2 text-[#00d4aa] font-semibold text-sm uppercase tracking-widest">
+        <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Library
+      </div>
+      <h1 class="text-3xl font-bold text-white">Policy & Procedure</h1>
+      <p class="text-slate-400 text-sm mt-1">Manage policy and procedure documents</p>
+    </div>
+    <button onclick="openPolicyModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
+      <span class="material-symbols-outlined">add</span>Add Document
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-[#00d4aa]/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#00d4aa]">description</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Total Documents</div>
+          <div class="text-xl font-bold text-white" id="policy-stat-total">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-400">check_circle</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Active</div>
+          <div class="text-xl font-bold text-green-400" id="policy-stat-active">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-400">archive</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Obsolete</div>
+          <div class="text-xl font-bold text-red-400" id="policy-stat-obsolete">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass p-4 rounded-xl mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="text-xs text-slate-400 ml-1">Search</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+          <input id="policy-search" oninput="filterPolicyData()" class="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Search by document name or number..." type="text">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 ml-1">Filter by Status</label>
+        <select id="policy-filter-status" onchange="filterPolicyData()" class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Obsolete">Obsolete</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black/20">
+          <tr>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">No</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Document Name</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Doc Number</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Department</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Owner</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Effective Date</th>
+            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="policy-table-body" class="divide-y divide-white/5">
+          <tr><td colspan="8" class="p-8 text-center text-slate-400">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- BI REGULATION PAGE -->
+<div id="page-repo-bi" class="page" style="display:none;">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div>
+      <div class="flex items-center gap-2 text-[#00d4aa] font-semibold text-sm uppercase tracking-widest">
+        <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Library
+      </div>
+      <h1 class="text-3xl font-bold text-white">BI Regulation</h1>
+      <p class="text-slate-400 text-sm mt-1">Manage regulations from Bank Indonesia</p>
+    </div>
+    <button onclick="openBIModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
+      <span class="material-symbols-outlined">add</span>Add Document
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-[#00d4aa]/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#00d4aa]">description</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Total Documents</div>
+          <div class="text-xl font-bold text-white" id="bi-stat-total">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-400">check_circle</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Active</div>
+          <div class="text-xl font-bold text-green-400" id="bi-stat-active">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-400">archive</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Obsolete</div>
+          <div class="text-xl font-bold text-red-400" id="bi-stat-obsolete">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass p-4 rounded-xl mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="text-xs text-slate-400 ml-1">Search</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+          <input id="bi-search" oninput="filterBIData()" class="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Search by document name or number..." type="text">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 ml-1">Filter by Status</label>
+        <select id="bi-filter-status" onchange="filterBIData()" class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Obsolete">Obsolete</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black/20">
+          <tr>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">No</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Number Doc</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Name Document</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Description</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
+            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="bi-table-body" class="divide-y divide-white/5">
+          <tr><td colspan="6" class="p-8 text-center text-slate-400">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- DIRECTORY PAGE -->
+<div id="page-repo-directory" class="page" style="display:none;">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div>
+      <div class="flex items-center gap-2 text-[#00d4aa] font-semibold text-sm uppercase tracking-widest">
+        <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Library
+      </div>
+      <h1 class="text-3xl font-bold text-white">Directory</h1>
+      <p class="text-slate-400 text-sm mt-1">Document directory</p>
+    </div>
+    <button onclick="openDirectoryModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
+      <span class="material-symbols-outlined">add</span>Add Document
+    </button>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-[#00d4aa]/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#00d4aa]">description</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Total Documents</div>
+          <div class="text-xl font-bold text-white" id="directory-stat-total">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-400">check_circle</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Active</div>
+          <div class="text-xl font-bold text-green-400" id="directory-stat-active">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-4 rounded-xl">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-400">archive</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Obsolete</div>
+          <div class="text-xl font-bold text-red-400" id="directory-stat-obsolete">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass p-4 rounded-xl mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="text-xs text-slate-400 ml-1">Search</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+          <input id="directory-search" oninput="filterDirectoryData()" class="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Search by document name or number..." type="text">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 ml-1">Filter by Status</label>
+        <select id="directory-filter-status" onchange="filterDirectoryData()" class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          <option value="">All Status</option>
+          <option value="Active">Active</option>
+          <option value="Obsolete">Obsolete</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black/20">
+          <tr>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">No</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Number Doc</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Name Document</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Description</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
+            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="directory-table-body" class="divide-y divide-white/5">
+          <tr><td colspan="6" class="p-8 text-center text-slate-400">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="policy-modal" class="fixed inset-0 z-[10000] hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closePolicyModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div class="glass rounded-2xl shadow-2xl max-w-3xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+      <div class="border-b border-white/10 p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-white" id="policy-modal-title">Add Document</h2>
+        <button onclick="closePolicyModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
+          <span class="material-symbols-outlined text-slate-400">close</span>
+        </button>
+      </div>
+      <form id="policy-form" onsubmit="savePolicyDocument(event)" class="p-6">
+        <input type="hidden" id="policy-row-index">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Document Name *</label>
+            <input type="text" id="policy-docname" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Document Number *</label>
+            <input type="text" id="policy-docnumber" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Department *</label>
+            <input type="text" id="policy-department" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Owner *</label>
+            <input type="text" id="policy-owner" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+            <select id="policy-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="Active">Active</option>
+              <option value="Obsolete">Obsolete</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Effective Date *</label>
+            <input type="date" id="policy-effectivedate" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Google Drive Link *</label>
+            <input type="url" id="policy-drivelink" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closePolicyModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="bi-modal" class="fixed inset-0 z-[10000] hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeBIModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div class="glass rounded-2xl shadow-2xl max-w-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+      <div class="border-b border-white/10 p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-white" id="bi-modal-title">Add BI Regulation</h2>
+        <button onclick="closeBIModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
+          <span class="material-symbols-outlined text-slate-400">close</span>
+        </button>
+      </div>
+      <form id="bi-form" onsubmit="saveBIDocument(event)" class="p-6">
+        <input type="hidden" id="bi-row-index">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Number Doc *</label>
+            <input type="text" id="bi-numberdoc" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Name Document *</label>
+            <input type="text" id="bi-namedoc" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Description</label>
+            <textarea id="bi-description" rows="3" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+            <select id="bi-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="Active">Active</option>
+              <option value="Obsolete">Obsolete</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Drive Link</label>
+            <input type="url" id="bi-drivelink" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeBIModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<div id="directory-modal" class="fixed inset-0 z-[10000] hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeDirectoryModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div class="glass rounded-2xl shadow-2xl max-w-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+      <div class="border-b border-white/10 p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-white" id="directory-modal-title">Add Directory Document</h2>
+        <button onclick="closeDirectoryModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
+          <span class="material-symbols-outlined text-slate-400">close</span>
+        </button>
+      </div>
+      <form id="directory-form" onsubmit="saveDirectoryDocument(event)" class="p-6">
+        <input type="hidden" id="directory-row-index">
+        <div class="space-y-4">
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Number Doc *</label>
+            <input type="text" id="directory-numberdoc" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Name Document *</label>
+            <input type="text" id="directory-namedoc" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Description</label>
+            <textarea id="directory-description" rows="3" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]"></textarea>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+            <select id="directory-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="Active">Active</option>
+              <option value="Obsolete">Obsolete</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Drive Link</label>
+            <input type="url" id="directory-drivelink" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="https://drive.google.com/...">
+          </div>
+        </div>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeDirectoryModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition">Save Document</button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+// Global variables
+var policyData = [];
+var biData = [];
+var directoryData = [];
+var currentFilterPolicy = { search: '', status: '' };
+var currentFilterBI = { search: '', status: '' };
+var currentFilterDirectory = { search: '', status: '' };
+
+// Initialize
+window.initRepositoryPage = function(pageId) {
+  console.log('initRepositoryPage:', pageId);
+  
+  document.querySelectorAll('.page').forEach(function(p) {
+    p.style.display = 'none';
+    p.classList.remove('active');
+  });
+  
+  var targetPage = document.getElementById('page-' + pageId);
+  if (targetPage) {
+    targetPage.style.display = 'block';
+    targetPage.classList.add('active');
+  }
+  
+  if (pageId === 'repo-policy') loadPolicyData();
+  else if (pageId === 'repo-bi') loadBIData();
+  else if (pageId === 'repo-directory') loadDirectoryData();
+};
+
+// POLICY FUNCTIONS
+function loadPolicyData() {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.success) {
+        policyData = res.documents || [];
+        currentFilterPolicy.search = '';
+        currentFilterPolicy.status = '';
+        document.getElementById('policy-search').value = '';
+        document.getElementById('policy-filter-status').value = '';
+        renderPolicyTable(policyData);
+        updatePolicyStats();
+      }
+    })
+    .getRepoData('repo-policy');
+}
+
+function updatePolicyStats() {
+  document.getElementById('policy-stat-total').textContent = policyData.length;
+  document.getElementById('policy-stat-active').textContent = policyData.filter(function(d) { return d.Status === 'Active'; }).length;
+  document.getElementById('policy-stat-obsolete').textContent = policyData.filter(function(d) { return d.Status === 'Obsolete'; }).length;
+}
+
+function renderPolicyTable(data) {
+  var tbody = document.getElementById('policy-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="8" class="p-8 text-center text-slate-400">No documents found</td></tr>';
+    return;
+  }
+  
+  data.forEach(function(doc, index) {
+    var row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
+    row.innerHTML = '<td class="p-4 text-sm text-slate-300">' + (doc.No || (index + 1)) + '</td>' +
+      '<td class="p-4 text-sm text-white font-medium">' + (doc.DocumentName || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300 font-mono">' + (doc.DocNumber || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (doc.Department || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (doc.Owner || '-') + '</td>' +
+      '<td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ' + (doc.Status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400') + '">' + (doc.Status || '-') + '</span></td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (doc.EffectiveDate || '-') + '</td>' +
+      '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
+        (doc.DriveLink ? '<a href="' + doc.DriveLink + '" target="_blank" class="p-2 text-[#00d4aa] hover:bg-[#00d4aa]/10 rounded-lg" title="Download"><span class="material-symbols-outlined text-[18px]">download</span></a>' : '') +
+        '<button onclick="editPolicyDoc(' + doc.rowIndex + ')" class="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+      '</div></td>';
+    tbody.appendChild(row);
+  });
+}
+
+function filterPolicyData() {
+  var search = document.getElementById('policy-search').value.toLowerCase();
+  var statusFilter = document.getElementById('policy-filter-status').value;
+  
+  currentFilterPolicy.search = search;
+  currentFilterPolicy.status = statusFilter;
+  
+  var filtered = policyData.filter(function(doc) {
+    var matchSearch = !search || (doc.DocumentName && doc.DocumentName.toLowerCase().includes(search)) || (doc.DocNumber && doc.DocNumber.toLowerCase().includes(search));
+    var matchStatus = !statusFilter || doc.Status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+  renderPolicyTable(filtered);
+}
+
+function editPolicyDoc(rowIndex) {
+  var doc = policyData.find(function(d) { return d.rowIndex === rowIndex; });
+  if (!doc) {
+    showToast('Document not found', 'error');
+    return;
+  }
+  
+  document.getElementById('policy-modal-title').textContent = 'Edit Document';
+  document.getElementById('policy-row-index').value = doc.rowIndex;
+  document.getElementById('policy-docname').value = doc.DocumentName || '';
+  document.getElementById('policy-docnumber').value = doc.DocNumber || '';
+  document.getElementById('policy-department').value = doc.Department || '';
+  document.getElementById('policy-owner').value = doc.Owner || '';
+  document.getElementById('policy-status').value = doc.Status || 'Active';
+  document.getElementById('policy-effectivedate').value = doc.EffectiveDate || '';
+  document.getElementById('policy-drivelink').value = doc.DriveLink || '';
+  
+  document.getElementById('policy-modal').classList.remove('hidden');
+}
+
+function openPolicyModal() {
+  document.getElementById('policy-modal-title').textContent = 'Add Document';
+  document.getElementById('policy-form').reset();
+  document.getElementById('policy-row-index').value = '';
+  document.getElementById('policy-effectivedate').value = new Date().toISOString().split('T')[0];
+  document.getElementById('policy-modal').classList.remove('hidden');
+}
+
+function closePolicyModal() {
+  document.getElementById('policy-modal').classList.add('hidden');
+}
+
+function savePolicyDocument(e) {
+  e.preventDefault();
+  if (typeof showLoading === 'function') showLoading('Saving document...');
+  
+  var rowIndex = document.getElementById('policy-row-index').value;
+  var docData = {
+    DocumentName: document.getElementById('policy-docname').value,
+    DocNumber: document.getElementById('policy-docnumber').value,
+    Department: document.getElementById('policy-department').value,
+    Owner: document.getElementById('policy-owner').value,
+    Status: document.getElementById('policy-status').value,
+    EffectiveDate: document.getElementById('policy-effectivedate').value,
+    DriveLink: document.getElementById('policy-drivelink').value
+  };
+  
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (res && res.success) {
+        closePolicyModal();
+        loadPolicyData();
+        if (typeof showToast === 'function') {
+          setTimeout(function() { showToast(res.message, 'success'); }, 200);
+        }
+      } else {
+        if (typeof showToast === 'function') showToast(res.message || 'Failed', 'error');
+      }
+    })
+    .withFailureHandler(function(err) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+    })
+    .saveRepoDocument('repo-policy', rowIndex, docData);
+}
+
+// BI FUNCTIONS
+function loadBIData() {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.success) {
+        biData = res.documents || [];
+        currentFilterBI.search = '';
+        currentFilterBI.status = '';
+        document.getElementById('bi-search').value = '';
+        document.getElementById('bi-filter-status').value = '';
+        renderBITable(biData);
+        updateBIStats();
+      }
+    })
+    .getRepoData('repo-bi');
+}
+
+function updateBIStats() {
+  document.getElementById('bi-stat-total').textContent = biData.length;
+  document.getElementById('bi-stat-active').textContent = biData.filter(function(d) { return d.Status === 'Active'; }).length;
+  document.getElementById('bi-stat-obsolete').textContent = biData.filter(function(d) { return d.Status === 'Obsolete'; }).length;
+}
+
+function renderBITable(data) {
+  var tbody = document.getElementById('bi-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No documents found</td></tr>';
+    return;
+  }
+  
+  data.forEach(function(doc, index) {
+    var row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
+    row.innerHTML = '<td class="p-4 text-sm text-slate-300">' + (index + 1) + '</td>' +
+      '<td class="p-4 text-sm text-slate-300 font-mono">' + (doc.NumberDoc || '-') + '</td>' +
+      '<td class="p-4 text-sm text-white font-medium">' + (doc.NameDocument || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (doc.Description || '-') + '</td>' +
+      '<td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ' + (doc.Status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400') + '">' + (doc.Status || '-') + '</span></td>' +
+      '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
+        (doc.DriveLink ? '<a href="' + doc.DriveLink + '" target="_blank" class="p-2 text-[#00d4aa] hover:bg-[#00d4aa]/10 rounded-lg" title="Download"><span class="material-symbols-outlined text-[18px]">download</span></a>' : '') +
+        '<button onclick="editBIDoc(' + doc.rowIndex + ')" class="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+      '</div></td>';
+    tbody.appendChild(row);
+  });
+}
+
+function filterBIData() {
+  var search = document.getElementById('bi-search').value.toLowerCase();
+  var statusFilter = document.getElementById('bi-filter-status').value;
+  
+  currentFilterBI.search = search;
+  currentFilterBI.status = statusFilter;
+  
+  var filtered = biData.filter(function(doc) {
+    var matchSearch = !search || (doc.NameDocument && doc.NameDocument.toLowerCase().includes(search)) || (doc.NumberDoc && doc.NumberDoc.toLowerCase().includes(search));
+    var matchStatus = !statusFilter || doc.Status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+  renderBITable(filtered);
+}
+
+function editBIDoc(rowIndex) {
+  var doc = biData.find(function(d) { return d.rowIndex === rowIndex; });
+  if (!doc) {
+    showToast('Document not found', 'error');
+    return;
+  }
+  
+  document.getElementById('bi-modal-title').textContent = 'Edit BI Regulation';
+  document.getElementById('bi-row-index').value = doc.rowIndex;
+  document.getElementById('bi-numberdoc').value = doc.NumberDoc || '';
+  document.getElementById('bi-namedoc').value = doc.NameDocument || '';
+  document.getElementById('bi-description').value = doc.Description || '';
+  document.getElementById('bi-status').value = doc.Status || 'Active';
+  document.getElementById('bi-drivelink').value = doc.DriveLink || '';
+  
+  document.getElementById('bi-modal').classList.remove('hidden');
+}
+
+function openBIModal() {
+  document.getElementById('bi-modal-title').textContent = 'Add BI Regulation';
+  document.getElementById('bi-form').reset();
+  document.getElementById('bi-row-index').value = '';
+  document.getElementById('bi-modal').classList.remove('hidden');
+}
+
+function closeBIModal() {
+  document.getElementById('bi-modal').classList.add('hidden');
+}
+
+function saveBIDocument(e) {
+  e.preventDefault();
+  if (typeof showLoading === 'function') showLoading('Saving document...');
+  
+  var rowIndex = document.getElementById('bi-row-index').value;
+  var docData = {
+    NumberDoc: document.getElementById('bi-numberdoc').value,
+    NameDocument: document.getElementById('bi-namedoc').value,
+    Description: document.getElementById('bi-description').value,
+    Status: document.getElementById('bi-status').value,
+    DriveLink: document.getElementById('bi-drivelink').value
+  };
+  
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (res && res.success) {
+        closeBIModal();
+        loadBIData();
+        if (typeof showToast === 'function') {
+          setTimeout(function() { showToast(res.message, 'success'); }, 200);
+        }
+      } else {
+        if (typeof showToast === 'function') showToast(res.message || 'Failed', 'error');
+      }
+    })
+    .withFailureHandler(function(err) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+    })
+    .saveRepoDocument('repo-bi', rowIndex, docData);
+}
+
+// DIRECTORY FUNCTIONS
+function loadDirectoryData() {
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (res && res.success) {
+        directoryData = res.documents || [];
+        currentFilterDirectory.search = '';
+        currentFilterDirectory.status = '';
+        document.getElementById('directory-search').value = '';
+        document.getElementById('directory-filter-status').value = '';
+        renderDirectoryTable(directoryData);
+        updateDirectoryStats();
+      }
+    })
+    .getRepoData('repo-directory');
+}
+
+function updateDirectoryStats() {
+  document.getElementById('directory-stat-total').textContent = directoryData.length;
+  document.getElementById('directory-stat-active').textContent = directoryData.filter(function(d) { return d.Status === 'Active'; }).length;
+  document.getElementById('directory-stat-obsolete').textContent = directoryData.filter(function(d) { return d.Status === 'Obsolete'; }).length;
+}
+
+function renderDirectoryTable(data) {
+  var tbody = document.getElementById('directory-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No documents found</td></tr>';
+    return;
+  }
+  
+  data.forEach(function(doc, index) {
+    var row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
+    row.innerHTML = '<td class="p-4 text-sm text-slate-300">' + (index + 1) + '</td>' +
+      '<td class="p-4 text-sm text-slate-300 font-mono">' + (doc.NumberDoc || '-') + '</td>' +
+      '<td class="p-4 text-sm text-white font-medium">' + (doc.NameDocument || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (doc.Description || '-') + '</td>' +
+      '<td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ' + (doc.Status === 'Active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400') + '">' + (doc.Status || '-') + '</span></td>' +
+      '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
+        (doc.DriveLink ? '<a href="' + doc.DriveLink + '" target="_blank" class="p-2 text-[#00d4aa] hover:bg-[#00d4aa]/10 rounded-lg" title="Download"><span class="material-symbols-outlined text-[18px]">download</span></a>' : '') +
+        '<button onclick="editDirectoryDoc(' + doc.rowIndex + ')" class="p-2 text-blue-400 hover:bg-blue-500/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+      '</div></td>';
+    tbody.appendChild(row);
+  });
+}
+
+function filterDirectoryData() {
+  var search = document.getElementById('directory-search').value.toLowerCase();
+  var statusFilter = document.getElementById('directory-filter-status').value;
+  
+  currentFilterDirectory.search = search;
+  currentFilterDirectory.status = statusFilter;
+  
+  var filtered = directoryData.filter(function(doc) {
+    var matchSearch = !search || (doc.NameDocument && doc.NameDocument.toLowerCase().includes(search)) || (doc.NumberDoc && doc.NumberDoc.toLowerCase().includes(search));
+    var matchStatus = !statusFilter || doc.Status === statusFilter;
+    return matchSearch && matchStatus;
+  });
+  renderDirectoryTable(filtered);
+}
+
+function editDirectoryDoc(rowIndex) {
+  var doc = directoryData.find(function(d) { return d.rowIndex === rowIndex; });
+  if (!doc) {
+    showToast('Document not found', 'error');
+    return;
+  }
+  
+  document.getElementById('directory-modal-title').textContent = 'Edit Directory Document';
+  document.getElementById('directory-row-index').value = doc.rowIndex;
+  document.getElementById('directory-numberdoc').value = doc.NumberDoc || '';
+  document.getElementById('directory-namedoc').value = doc.NameDocument || '';
+  document.getElementById('directory-description').value = doc.Description || '';
+  document.getElementById('directory-status').value = doc.Status || 'Active';
+  document.getElementById('directory-drivelink').value = doc.DriveLink || '';
+  
+  document.getElementById('directory-modal').classList.remove('hidden');
+}
+
+function openDirectoryModal() {
+  document.getElementById('directory-modal-title').textContent = 'Add Directory Document';
+  document.getElementById('directory-form').reset();
+  document.getElementById('directory-row-index').value = '';
+  document.getElementById('directory-modal').classList.remove('hidden');
+}
+
+function closeDirectoryModal() {
+  document.getElementById('directory-modal').classList.add('hidden');
+}
+
+function saveDirectoryDocument(e) {
+  e.preventDefault();
+  if (typeof showLoading === 'function') showLoading('Saving document...');
+  
+  var rowIndex = document.getElementById('directory-row-index').value;
+  var docData = {
+    NumberDoc: document.getElementById('directory-numberdoc').value,
+    NameDocument: document.getElementById('directory-namedoc').value,
+    Description: document.getElementById('directory-description').value,
+    Status: document.getElementById('directory-status').value,
+    DriveLink: document.getElementById('directory-drivelink').value
+  };
+  
+  google.script.run
+    .withSuccessHandler(function(res) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (res && res.success) {
+        closeDirectoryModal();
+        loadDirectoryData();
+        if (typeof showToast === 'function') {
+          setTimeout(function() { showToast(res.message, 'success'); }, 200);
+        }
+      } else {
+        if (typeof showToast === 'function') showToast(res.message || 'Failed', 'error');
+      }
+    })
+    .withFailureHandler(function(err) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+    })
+    .saveRepoDocument('repo-directory', rowIndex, docData);
+}
+
+console.log('repository.html loaded - All features enabled');
+</script>
