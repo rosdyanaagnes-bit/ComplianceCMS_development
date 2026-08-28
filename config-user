@@ -5,7 +5,7 @@
         <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Configuration
       </div>
       <h1 class="text-3xl font-bold text-white">User Management</h1>
-      <p class="text-slate-400 text-sm mt-1">Kelola pengguna sistem Compliance Activity</p>
+      <p class="text-slate-400 text-sm mt-1">Manage Compliance Activity system users</p>
     </div>
     <div class="flex gap-3">
       <button onclick="openCreateUserModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <!-- ✅ REVISI 4: Total Roles dihapus, grid menjadi 3 kolom -->
+  <!-- Stats Cards -->
   <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
     <div class="glass p-6 rounded-2xl">
       <div class="flex items-center gap-4">
@@ -51,13 +51,14 @@
     </div>
   </div>
 
+  <!-- Search & Filter -->
   <div class="glass p-6 rounded-2xl mb-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <div class="md:col-span-2">
+      <div class="md:col-span-1">
         <label class="text-xs text-slate-400 ml-1">Search User</label>
         <div class="relative">
           <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
-          <input id="searchUser" onkeyup="filterUsers()" class="w-full pl-10 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Cari nama, username, atau email..." type="text">
+          <input id="searchUser" onkeyup="filterUsers()" class="w-full pl-10 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Search name, username, or email..." type="text">
         </div>
       </div>
       <div>
@@ -77,17 +78,18 @@
     </div>
   </div>
 
+  <!-- User Table -->
   <div class="glass rounded-2xl overflow-hidden">
     <div class="overflow-x-auto">
       <table class="w-full">
         <thead class="bg-black/20">
           <tr>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">User</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Username</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Role</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Date Created</th>
-            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 30%">User</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Username</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Role</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 10%">Status</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Date Created</th>
+            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Actions</th>
           </tr>
         </thead>
         <tbody id="user-table-body" class="divide-y divide-white/5">
@@ -99,87 +101,95 @@
 </div>
 
 <!-- CREATE/EDIT USER MODAL -->
-<div id="user-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);">
-  <div class="glass rounded-2xl shadow-2xl max-w-2xl w-full mx-4 border border-white/10" style="animation: fadeIn 0.3s ease-out;">
-    <div class="border-b border-white/10 p-6 flex justify-between items-center">
-      <h2 class="text-2xl font-bold text-white" id="user-modal-title">Add New User</h2>
-      <button onclick="closeUserModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
-        <span class="material-symbols-outlined text-slate-400">close</span>
-      </button>
-    </div>
-    <form id="user-form" onsubmit="saveUser(event)" class="p-6">
-      <input type="hidden" id="user-row-index">
-      <div class="grid grid-cols-2 gap-4">
-        <div class="col-span-2">
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Nama Lengkap *</label>
-          <input type="text" id="user-name" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Nama lengkap pengguna">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Username *</label>
-          <input type="text" id="user-username" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Username unik">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Email *</label>
-          <input type="email" id="user-email" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="nama@company.com">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">No. Telepon/WhatsApp</label>
-          <input type="tel" id="user-phone" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="contoh : 08121260XXXX">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Telegram ID (Optional)</label>
-          <input type="text" id="user-telegram" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="contoh : 28046770">
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Role *</label>
-          <select id="user-role" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
-            <option value="">Pilih Role...</option>
-          </select>
-        </div>
-        <div>
-          <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
-          <select id="user-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
-            <option value="Aktif">Aktif</option>
-            <option value="Nonaktif">Nonaktif</option>
-          </select>
-        </div>
-        <div class="col-span-2 bg-[#00d4aa]/10 p-4 rounded-lg border border-[#00d4aa]/20">
-          <div class="flex items-start gap-3">
-            <span class="material-symbols-outlined text-[#00d4aa] mt-0.5">key</span>
-            <div class="flex-1">
-              <p class="text-sm font-semibold text-[#00d4aa]">Password Management</p>
-              <p class="text-xs text-slate-400 mt-1">Password akan di-generate otomatis saat membuat user baru.</p>
-              <div class="mt-3 flex gap-2">
-                <input type="text" id="user-display-password" readonly class="flex-1 px-3 py-2 bg-black/30 border border-white/10 rounded text-sm text-slate-300 font-mono" placeholder="Password akan muncul di sini">
-                <button type="button" onclick="generateAndShowPassword()" class="px-4 py-2 bg-[#9d4edd] text-white text-sm font-semibold rounded hover:bg-[#9d4edd]/80 transition">Generate</button>
+<div id="user-modal" class="fixed inset-0 z-[10000] hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeUserModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div class="glass rounded-2xl shadow-2xl max-w-3xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+      <div class="border-b border-white/10 p-6 flex justify-between items-center">
+        <h2 class="text-2xl font-bold text-white" id="user-modal-title">Add New User</h2>
+        <button onclick="closeUserModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
+          <span class="material-symbols-outlined text-slate-400">close</span>
+        </button>
+      </div>
+      <form id="user-form" onsubmit="saveUser(event)" class="p-6">
+        <input type="hidden" id="user-row-index">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="md:col-span-2">
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Full Name *</label>
+            <input type="text" id="user-name" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Enter full name">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Username *</label>
+            <input type="text" id="user-username" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Unique username">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Email *</label>
+            <input type="email" id="user-email" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="name@company.com">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Phone/WhatsApp</label>
+            <input type="tel" id="user-phone" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g.: 08121260XXXX">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Telegram ID (Optional)</label>
+            <input type="text" id="user-telegram" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g.: 28046770">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Role *</label>
+            <select id="user-role" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="">Select Role...</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+            <select id="user-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="Aktif">Aktif</option>
+              <option value="Nonaktif">Nonaktif</option>
+            </select>
+          </div>
+          <div class="md:col-span-2 bg-[#00d4aa]/10 p-4 rounded-lg border border-[#00d4aa]/20">
+            <div class="flex items-start gap-3">
+              <span class="material-symbols-outlined text-[#00d4aa] mt-0.5">key</span>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-[#00d4aa]">Password Management</p>
+                <p class="text-xs text-slate-400 mt-1">Password will be auto-generated when creating a new user.</p>
+                <div class="mt-3 flex gap-2">
+                  <input type="text" id="user-display-password" readonly class="flex-1 px-3 py-2 bg-black/30 border border-white/10 rounded text-sm text-slate-300 font-mono" placeholder="Password will appear here">
+                  <button type="button" onclick="generateAndShowPassword()" class="px-4 py-2 bg-[#9d4edd] text-white text-sm font-semibold rounded hover:bg-[#9d4edd]/80 transition">Generate</button>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-      <div class="mt-6 flex gap-3">
-        <button type="button" onclick="closeUserModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
-        <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Save User</button>
-      </div>
-    </form>
+        <div class="mt-6 flex gap-3">
+          <button type="button" onclick="closeUserModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+          <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Save User</button>
+        </div>
+      </form>
+    </div>
   </div>
 </div>
 
-<!-- ✅ REVISI 2: Pop up Reset Password dengan UI yang Bagus -->
-<div id="reset-password-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);">
-  <div class="glass rounded-2xl shadow-2xl max-w-md w-full mx-4 p-8 text-center border border-white/10" style="animation: fadeIn 0.3s ease-out;">
-    <div class="w-20 h-20 bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(0,212,170,0.3)]">
-      <span class="material-symbols-outlined text-white" style="font-size: 48px;">lock_reset</span>
-    </div>
-    <h2 class="text-2xl font-bold text-white mb-2">Reset Password?</h2>
-    <p class="text-slate-400 mb-4">Password baru akan di-generate dan dikirim ke email:</p>
-    <div class="bg-white/5 rounded-lg p-4 mb-6 border border-white/10 flex items-center gap-3 justify-center">
-      <span class="material-symbols-outlined text-[#00d4aa]">email</span>
-      <span class="font-semibold text-white" id="reset-password-email-display">-</span>
-    </div>
-    <div class="flex gap-3">
-      <button onclick="closeResetPasswordModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Batal</button>
-      <button onclick="confirmResetPassword()" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Ya, Reset & Kirim</button>
+<!-- RESET PASSWORD MODAL -->
+<div id="reset-password-modal" class="fixed inset-0 z-[10000] hidden">
+  <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeResetPasswordModal()"></div>
+  <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+    <div class="glass rounded-2xl shadow-2xl max-w-md w-full border border-white/10 pointer-events-auto bg-[#1e2745]">
+      <div class="p-6 text-center">
+        <div class="w-20 h-20 bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] rounded-full flex items-center justify-center mx-auto mb-4 shadow-[0_0_30px_rgba(0,212,170,0.3)]">
+          <span class="material-symbols-outlined text-white" style="font-size: 48px;">lock_reset</span>
+        </div>
+        <h2 class="text-2xl font-bold text-white mb-2">Reset Password?</h2>
+        <p class="text-slate-400 mb-4">A new password will be generated and sent to email:</p>
+        <div class="bg-white/5 rounded-lg p-4 mb-6 border border-white/10 flex items-center gap-3 justify-center">
+          <span class="material-symbols-outlined text-[#00d4aa]">email</span>
+          <span class="font-semibold text-white" id="reset-password-email-display">-</span>
+        </div>
+        <div class="flex gap-3">
+          <button onclick="closeResetPasswordModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+          <button onclick="confirmResetPassword()" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Yes, Reset & Send</button>
+        </div>
+      </div>
     </div>
   </div>
 </div>
@@ -188,10 +198,9 @@
   var allUsers = [];
   var filteredUsers = [];
   var allRoles = [];
-  var resetPasswordRowIndex = null; // ✅ Hanya simpan index untuk reset password
+  var resetPasswordRowIndex = null;
   var tempPassword = '';
 
-  // ✅ REVISI 1 & 5: Load data langsung tanpa loading page full screen, data selalu fresh dari sheet
   function loadUsers() {
     console.log('=== loadUsers START (Fresh from Sheet) ===');
     
@@ -229,13 +238,15 @@
     if (!select) return;
     
     var currentValue = select.value;
-    select.innerHTML = '<option value="">Pilih Role...</option>';
+    select.innerHTML = '<option value="">Select Role...</option>';
     if (filterSelect) filterSelect.innerHTML = '<option value="">All Roles</option>';
     
     allRoles.forEach(function(role) {
-      if (role.Status === 'Aktif') {
-        select.innerHTML += '<option value="' + role['Nama Role'] + '">' + role['Nama Role'] + '</option>';
-        if (filterSelect) filterSelect.innerHTML += '<option value="' + role['Nama Role'] + '">' + role['Nama Role'] + '</option>';
+      var roleName = role['Nama Role'] || role['Role Name'];
+      var status = (role.Status || '').toString().trim().toLowerCase();
+      if (status === 'aktif' || status === 'active') {
+        select.innerHTML += '<option value="' + roleName + '">' + roleName + '</option>';
+        if (filterSelect) filterSelect.innerHTML += '<option value="' + roleName + '">' + roleName + '</option>';
       }
     });
     if (currentValue) select.value = currentValue;
@@ -247,32 +258,34 @@
     tbody.innerHTML = '';
     
     if (filteredUsers.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Tidak ada user ditemukan</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">No users found</td></tr>';
       return;
     }
     
     filteredUsers.forEach(function(user) {
-      var statusClass = user.Status === 'Aktif' ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30';
-      var initial = (user['Nama Lengkap'] || 'U').charAt(0).toUpperCase();
+      // Support both Indonesian and English headers
+      var fullName = user['Nama Lengkap'] || user['Full Name'] || '-';
+      var username = user.Username || '-';
+      var email = user.Email || '-';
+      var role = user.Role || '-';
+      var status = user.Status || '-';
+      var dateCreated = user['Tanggal Buat'] || user['Date Created'] || '-';
       
-      var photoHtml = user['Foto Profil'] 
-        ? '<img src="' + user['Foto Profil'] + '" class="w-10 h-10 rounded-full object-cover border-2 border-[#00d4aa]/50">'
-        : '<div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center text-white font-bold shadow-lg">' + initial + '</div>';
+      var statusClass = status.toString().trim().toLowerCase() === 'aktif' || status.toString().trim().toLowerCase() === 'active'
+        ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+        : 'bg-red-500/20 text-red-400 border-red-500/30';
       
-      var roleBadge = user.Role 
-        ? '<span class="px-2 py-1 bg-white/10 text-white border border-white/20 rounded text-xs font-semibold">' + user.Role + '</span>'
-        : '<span class="px-2 py-1 bg-white/5 text-slate-400 border border-white/10 rounded text-xs">-</span>';
+      var initial = fullName.charAt(0).toUpperCase();
       
       var rowIndex = user.rowIndex;
       
-      // ✅ REVISI: Tombol Delete dihapus, hanya tersisa Reset Password dan Edit
       var row = document.createElement('tr');
       row.className = 'hover:bg-white/5 transition-colors';
-      row.innerHTML = '<td class="p-4"><div class="flex items-center gap-3">' + photoHtml + '<div><div class="font-semibold text-white">' + (user['Nama Lengkap'] || '-') + '</div><div class="text-xs text-slate-400">' + (user.Email || '-') + '</div></div></div></td>' +
-        '<td class="p-4 font-mono text-sm text-slate-300">' + (user.Username || '-') + '</td>' +
-        '<td class="p-4">' + roleBadge + '</td>' +
-        '<td class="p-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ' + statusClass + '">' + (user.Status || '-') + '</span></td>' +
-        '<td class="p-4 text-sm text-slate-400">' + (user['Date Created'] || '-') + '</td>' +
+      row.innerHTML = '<td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center text-white font-bold shadow-lg">' + initial + '</div><div><div class="font-semibold text-white">' + fullName + '</div><div class="text-xs text-slate-400">' + email + '</div></div></div></td>' +
+        '<td class="p-4 font-mono text-sm text-slate-300">' + username + '</td>' +
+        '<td class="p-4"><span class="px-2 py-1 bg-white/10 text-white border border-white/20 rounded text-xs font-semibold">' + role + '</span></td>' +
+        '<td class="p-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ' + statusClass + '">' + status + '</span></td>' +
+        '<td class="p-4 text-sm text-slate-400 whitespace-nowrap">' + dateCreated + '</td>' +
         '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
           '<button onclick="openResetPasswordModal(' + rowIndex + ')" class="p-2 text-[#00d4aa] hover:bg-[#00d4aa]/10 rounded-lg transition group" title="Reset Password">' +
             '<span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">key</span>' +
@@ -289,9 +302,27 @@
     var totalEl = document.getElementById('stat-total');
     var activeEl = document.getElementById('stat-active');
     var inactiveEl = document.getElementById('stat-inactive');
-    if (totalEl) totalEl.textContent = allUsers.length;
-    if (activeEl) activeEl.textContent = allUsers.filter(function(u) { return u.Status === 'Aktif'; }).length;
-    if (inactiveEl) inactiveEl.textContent = allUsers.filter(function(u) { return u.Status === 'Nonaktif'; }).length;
+    
+    if (!allUsers || allUsers.length === 0) {
+      if (totalEl) totalEl.textContent = '0';
+      if (activeEl) activeEl.textContent = '0';
+      if (inactiveEl) inactiveEl.textContent = '0';
+      return;
+    }
+    
+    var total = allUsers.length;
+    var activeCount = allUsers.filter(function(u) { 
+      var status = (u.Status || '').toString().trim().toLowerCase();
+      return status === 'aktif' || status === 'active';
+    }).length;
+    var inactiveCount = allUsers.filter(function(u) { 
+      var status = (u.Status || '').toString().trim().toLowerCase();
+      return status === 'nonaktif' || status === 'inactive';
+    }).length;
+    
+    if (totalEl) totalEl.textContent = total;
+    if (activeEl) activeEl.textContent = activeCount;
+    if (inactiveEl) inactiveEl.textContent = inactiveCount;
   }
 
   function filterUsers() {
@@ -300,12 +331,16 @@
     var statusFilter = document.getElementById('filterStatus').value;
     
     filteredUsers = allUsers.filter(function(user) {
-      var name = (user['Nama Lengkap'] || '').toString().toLowerCase();
+      var fullName = (user['Nama Lengkap'] || user['Full Name'] || '').toString().toLowerCase();
       var username = (user.Username || '').toString().toLowerCase();
       var email = (user.Email || '').toString().toLowerCase();
-      var matchSearch = !search || name.includes(search) || username.includes(search) || email.includes(search);
-      var matchRole = !roleFilter || user.Role === roleFilter;
-      var matchStatus = !statusFilter || user.Status === statusFilter;
+      var role = user.Role || '';
+      var status = user.Status || '';
+      
+      var matchSearch = !search || fullName.includes(search) || username.includes(search) || email.includes(search);
+      var matchRole = !roleFilter || role === roleFilter;
+      var matchStatus = !statusFilter || status === statusFilter;
+      
       return matchSearch && matchRole && matchStatus;
     });
     renderUsers();
@@ -319,7 +354,6 @@
     tempPassword = generatePasswordClient(10);
     document.getElementById('user-display-password').value = tempPassword;
     document.getElementById('user-modal').classList.remove('hidden');
-    document.getElementById('user-modal').classList.add('flex');
   }
 
   function generatePasswordClient(length) {
@@ -338,32 +372,32 @@
 
   function editUser(rowIndex) {
     var user = allUsers.find(function(u) { return u.rowIndex === rowIndex; });
-    if (!user) return;
+    if (!user) {
+      if (typeof showToast === 'function') showToast('User not found', 'error');
+      return;
+    }
     
     document.getElementById('user-modal-title').textContent = 'Edit User';
     document.getElementById('user-row-index').value = user.rowIndex;
-    document.getElementById('user-name').value = user['Nama Lengkap'] || '';
+    document.getElementById('user-name').value = user['Nama Lengkap'] || user['Full Name'] || '';
     document.getElementById('user-username').value = user.Username || '';
     document.getElementById('user-email').value = user.Email || '';
-    document.getElementById('user-phone').value = user['No Telepon'] || '';
+    document.getElementById('user-phone').value = user['No Telepon'] || user.Phone || '';
     document.getElementById('user-telegram').value = user['Telegram ID'] || '';
     document.getElementById('user-role').value = user.Role || '';
     document.getElementById('user-status').value = user.Status || 'Aktif';
-    document.getElementById('user-display-password').value = '****** (Gunakan Reset Password untuk mengubah)';
+    document.getElementById('user-display-password').value = '****** (Use Reset Password to change)';
     tempPassword = '';
     document.getElementById('user-modal').classList.remove('hidden');
-    document.getElementById('user-modal').classList.add('flex');
   }
 
   function closeUserModal() {
     document.getElementById('user-modal').classList.add('hidden');
-    document.getElementById('user-modal').classList.remove('flex');
   }
 
-  // ✅ REVISI 3: Loading page muncul PALING AWAL, sebelum proses apapun
   function saveUser(e) {
     e.preventDefault();
-    if (typeof showLoading === 'function') showLoading('Menyimpan data user...');
+    if (typeof showLoading === 'function') showLoading('Saving user data...');
     
     var rowIndex = document.getElementById('user-row-index').value;
     var userData = {
@@ -386,7 +420,7 @@
           if (typeof showToast === 'function') showToast(res.message, 'success');
         }, 100);
       } else {
-        if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Gagal menyimpan', 'error');
+        if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Failed to save', 'error');
       }
     };
     
@@ -397,36 +431,36 @@
     }
   }
 
-  // ✅ REVISI 2: Fungsi untuk membuka modal reset password yang bagus
   function openResetPasswordModal(rowIndex) {
     var user = allUsers.find(function(u) { return u.rowIndex === rowIndex; });
-    if (!user) return;
+    if (!user) {
+      if (typeof showToast === 'function') showToast('User not found', 'error');
+      return;
+    }
     
     resetPasswordRowIndex = rowIndex;
-    document.getElementById('reset-password-email-display').textContent = user.Email || 'Email tidak tersedia';
+    document.getElementById('reset-password-email-display').textContent = user.Email || 'Email not available';
     document.getElementById('reset-password-modal').classList.remove('hidden');
-    document.getElementById('reset-password-modal').classList.add('flex');
   }
 
   function closeResetPasswordModal() {
     document.getElementById('reset-password-modal').classList.add('hidden');
-    document.getElementById('reset-password-modal').classList.remove('flex');
     resetPasswordRowIndex = null;
   }
 
   function confirmResetPassword() {
     if (!resetPasswordRowIndex) return;
     
-    if (typeof showLoading === 'function') showLoading('Memproses reset password...');
+    if (typeof showLoading === 'function') showLoading('Processing password reset...');
     closeResetPasswordModal();
     
     google.script.run
       .withSuccessHandler(function(res) {
         if (typeof hideLoading === 'function') hideLoading();
         if (res && res.success) {
-          if (typeof showToast === 'function') showToast('Password baru telah dikirim ke email pengguna', 'success');
+          if (typeof showToast === 'function') showToast('New password has been sent to user email', 'success');
         } else {
-          if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Gagal reset', 'error');
+          if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Failed to reset', 'error');
         }
       })
       .withFailureHandler(function(err) {
@@ -436,15 +470,5 @@
       .resetUserPassword(resetPasswordRowIndex);
   }
 
-  // Event Listeners untuk menutup modal saat klik di luar area modal
-  var userModal = document.getElementById('user-modal');
-  if (userModal) {
-    userModal.addEventListener('click', function(e) { if (e.target === this) closeUserModal(); });
-  }
-  var resetPwModal = document.getElementById('reset-password-modal');
-  if (resetPwModal) {
-    resetPwModal.addEventListener('click', function(e) { if (e.target === this) closeResetPasswordModal(); });
-  }
-
-  console.log('=== config-user.html script loaded (Clean Version) ===');
+  console.log('=== config-user.html script loaded ===');
 </script>
