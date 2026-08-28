@@ -1,0 +1,389 @@
+<div id="page-setup-role" class="page">
+  <div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+    <div>
+      <div class="flex items-center gap-2 text-[#00d4aa] font-semibold text-sm uppercase tracking-widest">
+        <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Configuration
+      </div>
+      <h1 class="text-3xl font-bold text-white">Setup Role</h1>
+      <p class="text-slate-400 text-sm mt-1">Kelola role dan hak akses pengguna sistem</p>
+    </div>
+    <div class="flex gap-3">
+      <button onclick="openCreateRoleModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
+        <span class="material-symbols-outlined">add</span>Add Role
+      </button>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+    <div class="glass p-6 rounded-2xl">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-[#00d4aa]/20 rounded-xl flex items-center justify-center">
+          <span class="material-symbols-outlined text-[#00d4aa]">shield</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Total Roles</div>
+          <div class="text-2xl font-bold text-white" id="stat-total-roles">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-6 rounded-2xl">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-green-500/20 rounded-xl flex items-center justify-center">
+          <span class="material-symbols-outlined text-green-400">check_circle</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Active Roles</div>
+          <div class="text-2xl font-bold text-green-400" id="stat-active-roles">0</div>
+        </div>
+      </div>
+    </div>
+    <div class="glass p-6 rounded-2xl">
+      <div class="flex items-center gap-4">
+        <div class="w-12 h-12 bg-red-500/20 rounded-xl flex items-center justify-center">
+          <span class="material-symbols-outlined text-red-400">cancel</span>
+        </div>
+        <div>
+          <div class="text-slate-400 text-xs uppercase">Inactive Roles</div>
+          <div class="text-2xl font-bold text-red-400" id="stat-inactive-roles">0</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search & Filter -->
+  <div class="glass p-6 rounded-2xl mb-6">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div class="md:col-span-2">
+        <label class="text-xs text-slate-400 ml-1">Search Role</label>
+        <div class="relative">
+          <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+          <input id="searchRole" onkeyup="filterRoles()" class="w-full pl-10 pr-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Cari nama role atau deskripsi..." type="text">
+        </div>
+      </div>
+      <div>
+        <label class="text-xs text-slate-400 ml-1">Status</label>
+        <select id="filterRoleStatus" onchange="filterRoles()" class="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+          <option value="">All Status</option>
+          <option value="Aktif">Aktif</option>
+          <option value="Nonaktif">Nonaktif</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <!-- Role Table -->
+  <div class="glass rounded-2xl overflow-hidden">
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-black/20">
+          <tr>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Role</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Deskripsi</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Menu Access</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Tanggal Buat</th>
+            <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+          </tr>
+        </thead>
+        <tbody id="role-table-body" class="divide-y divide-white/5">
+          <tr><td colspan="6" class="p-8 text-center text-slate-400">Loading roles...</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- CREATE/EDIT ROLE MODAL -->
+<div id="role-modal" class="fixed inset-0 z-[10000] hidden items-center justify-center" style="background: rgba(0, 0, 0, 0.7); backdrop-filter: blur(8px);">
+  <div class="glass rounded-2xl shadow-2xl max-w-2xl w-full mx-4 border border-white/10" style="animation: fadeIn 0.3s ease-out;">
+    <div class="border-b border-white/10 p-6 flex justify-between items-center">
+      <h2 class="text-2xl font-bold text-white" id="role-modal-title">Add New Role</h2>
+      <button onclick="closeRoleModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
+        <span class="material-symbols-outlined text-slate-400">close</span>
+      </button>
+    </div>
+    <form id="role-form" onsubmit="saveRole(event)" class="p-6">
+      <input type="hidden" id="role-row-index">
+      <div class="space-y-4">
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Nama Role *</label>
+          <input type="text" id="role-name" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Contoh: Finance Manager">
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Deskripsi</label>
+          <textarea id="role-description" rows="3" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Deskripsi singkat tentang role ini..."></textarea>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Menu Access *</label>
+          <div class="grid grid-cols-2 gap-3 p-4 bg-black/20 border border-white/10 rounded-lg">
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="Dashboard" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">Dashboard</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="Task Management" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">Task Management</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="Repository" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">Repository</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="Team OKR" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">Team OKR</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="User Management" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">User Management</span>
+            </label>
+            <label class="flex items-center gap-2 cursor-pointer">
+              <input type="checkbox" name="menu-access" value="Menu Settings" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
+              <span class="text-slate-300 text-sm">Menu Settings</span>
+            </label>
+          </div>
+        </div>
+        <div>
+          <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+          <select id="role-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+            <option value="Aktif">Aktif</option>
+            <option value="Nonaktif">Nonaktif</option>
+          </select>
+        </div>
+      </div>
+      <div class="mt-6 flex gap-3">
+        <button type="button" onclick="closeRoleModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+        <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Save Role</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<script>
+  var allRoles = [];
+  var filteredRoles = [];
+
+  function loadRoles() {
+    console.log('=== setup-role: loadRoles START ===');
+    
+    google.script.run
+      .withSuccessHandler(function(res) {
+        console.log('=== setup-role: getAllRoles response ===', res);
+        
+        if (res && res.success) {
+          allRoles = res.roles || [];
+          console.log('setup-role: Total roles loaded:', allRoles.length);
+          filteredRoles = [...allRoles];
+          renderRoles();
+          updateRoleStats(); // Dipanggil setelah data pasti ada
+          console.log('setup-role: Stats updated');
+        } else {
+          console.error('setup-role: Error loading roles:', res ? res.message : 'Unknown');
+          if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Gagal memuat data', 'error');
+        }
+      })
+      .withFailureHandler(function(err) {
+        console.error('=== setup-role: getAllRoles FAILURE ===', err);
+        if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+      })
+      .getAllRoles();
+  }
+
+  function renderRoles() {
+    var tbody = document.getElementById('role-table-body');
+    if (!tbody) {
+      console.error('setup-role: role-table-body not found!');
+      return;
+    }
+    tbody.innerHTML = '';
+    
+    if (filteredRoles.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="p-8 text-center text-slate-400">Tidak ada role ditemukan</td></tr>';
+      return;
+    }
+    
+    filteredRoles.forEach(function(role) {
+      // Perbaikan: Case-insensitive check untuk status
+      var statusStr = (role.Status || '').toString().trim().toLowerCase();
+      var statusClass = statusStr === 'aktif' 
+        ? 'bg-green-500/20 text-green-400 border-green-500/30' 
+        : 'bg-red-500/20 text-red-400 border-red-500/30';
+      
+      var initial = (role['Nama Role'] || 'R').charAt(0).toUpperCase();
+      
+      var menuAccess = role['Menu Access'] || '';
+      var menuList = '';
+      if (menuAccess) {
+        try {
+          var menus = typeof menuAccess === 'string' ? JSON.parse(menuAccess) : menuAccess;
+          menuList = menus.map(function(m) {
+            return '<span class="inline-block px-2 py-1 bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30 rounded text-xs mr-1 mb-1">' + m + '</span>';
+          }).join('');
+        } catch (e) {
+          menuList = '<span class="text-slate-400 text-xs">' + menuAccess + '</span>';
+        }
+      } else {
+        menuList = '<span class="text-slate-500 text-xs">-</span>';
+      }
+      
+      var rowIndex = role.rowIndex;
+      
+      var row = document.createElement('tr');
+      row.className = 'hover:bg-white/5 transition-colors';
+      // PERBAIKAN: Tombol Delete dihapus, hanya tersisa Edit
+      row.innerHTML = '<td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center text-white font-bold">' + initial + '</div><div><div class="font-semibold text-white">' + (role['Nama Role'] || '-') + '</div><div class="text-xs text-slate-400">Role</div></div></div></td>' +
+        '<td class="p-4 text-sm text-slate-300 max-w-xs truncate">' + (role.Deskripsi || '-') + '</td>' +
+        '<td class="p-4"><div class="flex flex-wrap gap-1">' + menuList + '</div></td>' +
+        '<td class="p-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ' + statusClass + '">' + (role.Status || '-') + '</span></td>' +
+        '<td class="p-4 text-sm text-slate-400">' + (role['Tanggal Buat'] || '-') + '</td>' +
+        '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
+          '<button onclick="editRole(' + rowIndex + ')" class="p-2 text-[#9d4edd] hover:bg-[#9d4edd]/10 rounded-lg transition group" title="Edit">' +
+            '<span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">edit</span>' +
+          '</button>' +
+        '</div></td>';
+      tbody.appendChild(row);
+    });
+  }
+
+  // PERBAIKAN UTAMA: Logika statistik yang lebih kuat (toleran terhadap spasi/huruf kapital)
+  function updateRoleStats() {
+    var totalEl = document.getElementById('stat-total-roles');
+    var activeEl = document.getElementById('stat-active-roles');
+    var inactiveEl = document.getElementById('stat-inactive-roles');
+    
+    if (!allRoles || allRoles.length === 0) {
+      if (totalEl) totalEl.textContent = '0';
+      if (activeEl) activeEl.textContent = '0';
+      if (inactiveEl) inactiveEl.textContent = '0';
+      return;
+    }
+
+    var total = allRoles.length;
+    var activeCount = 0;
+    var inactiveCount = 0;
+
+    allRoles.forEach(function(r) {
+      var status = (r.Status || '').toString().trim().toLowerCase();
+      if (status === 'aktif') {
+        activeCount++;
+      } else if (status === 'nonaktif') {
+        inactiveCount++;
+      }
+    });
+
+    if (totalEl) totalEl.textContent = total;
+    if (activeEl) activeEl.textContent = activeCount;
+    if (inactiveEl) inactiveEl.textContent = inactiveCount;
+    
+    console.log('Stats updated - Total:', total, 'Active:', activeCount, 'Inactive:', inactiveCount);
+  }
+
+  function filterRoles() {
+    var search = document.getElementById('searchRole').value.toLowerCase();
+    var statusFilter = document.getElementById('filterRoleStatus').value;
+    
+    filteredRoles = allRoles.filter(function(role) {
+      var name = (role['Nama Role'] || '').toString().toLowerCase();
+      var desc = (role.Deskripsi || '').toString().toLowerCase();
+      var matchSearch = !search || name.includes(search) || desc.includes(search);
+      
+      var status = (role.Status || '').toString().trim();
+      var matchStatus = !statusFilter || status === statusFilter;
+      
+      return matchSearch && matchStatus;
+    });
+    renderRoles();
+  }
+
+  function openCreateRoleModal() {
+    document.getElementById('role-modal-title').textContent = 'Add New Role';
+    document.getElementById('role-form').reset();
+    document.getElementById('role-row-index').value = '';
+    document.getElementById('role-modal').classList.remove('hidden');
+    document.getElementById('role-modal').classList.add('flex');
+  }
+
+  function editRole(rowIndex) {
+    console.log('Editing role rowIndex:', rowIndex);
+    var role = allRoles.find(function(r) { return r.rowIndex === rowIndex; });
+    if (!role) {
+      if (typeof showToast === 'function') showToast('Role tidak ditemukan', 'error');
+      return;
+    }
+    
+    document.getElementById('role-modal-title').textContent = 'Edit Role';
+    document.getElementById('role-row-index').value = role.rowIndex;
+    document.getElementById('role-name').value = role['Nama Role'] || '';
+    document.getElementById('role-description').value = role.Deskripsi || '';
+    document.getElementById('role-status').value = role.Status || 'Aktif';
+    
+    var checkboxes = document.querySelectorAll('input[name="menu-access"]');
+    checkboxes.forEach(function(cb) { cb.checked = false; });
+    
+    if (role['Menu Access']) {
+      try {
+        var menus = typeof role['Menu Access'] === 'string' ? JSON.parse(role['Menu Access']) : role['Menu Access'];
+        checkboxes.forEach(function(cb) {
+          if (menus.indexOf(cb.value) !== -1) cb.checked = true;
+        });
+      } catch (e) {
+        console.error('Error parsing menu access', e);
+      }
+    }
+    
+    document.getElementById('role-modal').classList.remove('hidden');
+    document.getElementById('role-modal').classList.add('flex');
+  }
+
+  function closeRoleModal() {
+    document.getElementById('role-modal').classList.add('hidden');
+    document.getElementById('role-modal').classList.remove('flex');
+  }
+
+  function saveRole(e) {
+    e.preventDefault();
+    if (typeof showLoading === 'function') showLoading('Menyimpan role...');
+    
+    var rowIndex = document.getElementById('role-row-index').value;
+    var menuAccess = [];
+    document.querySelectorAll('input[name="menu-access"]:checked').forEach(function(cb) {
+      menuAccess.push(cb.value);
+    });
+    
+    var roleData = {
+      'Nama Role': document.getElementById('role-name').value.trim(),
+      'Deskripsi': document.getElementById('role-description').value.trim(),
+      'Menu Access': JSON.stringify(menuAccess),
+      'Status': document.getElementById('role-status').value
+    };
+    
+    var onSuccess = function(res) {
+      if (typeof hideLoading === 'function') hideLoading();
+      if (res && res.success) {
+        closeRoleModal();
+        setTimeout(function() {
+          loadRoles(); // Reload data akan otomatis memperbaiki stats juga
+          if (typeof showToast === 'function') showToast(res.message, 'success');
+        }, 100);
+      } else {
+        if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Gagal menyimpan', 'error');
+      }
+    };
+    
+    if (rowIndex) {
+      google.script.run.withSuccessHandler(onSuccess).updateRole(parseInt(rowIndex), roleData);
+    } else {
+      google.script.run.withSuccessHandler(onSuccess).createRole(roleData);
+    }
+  }
+
+  // Event listener untuk menutup modal saat klik di luar area modal
+  var roleModal = document.getElementById('role-modal');
+  if (roleModal) {
+    roleModal.addEventListener('click', function(e) {
+      if (e.target === this) closeRoleModal();
+    });
+  }
+
+  console.log('=== setup-role.html script loaded (Clean Version) ===');
+</script>
