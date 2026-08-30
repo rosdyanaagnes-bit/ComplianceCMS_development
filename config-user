@@ -65,6 +65,12 @@
         <label class="text-xs text-slate-400 ml-1">Role</label>
         <select id="filterRole" onchange="filterUsers()" class="w-full px-4 py-2.5 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
           <option value="">All Roles</option>
+          <option value="Superadmin">Superadmin</option>
+          <option value="Direktur">Direktur</option>
+          <option value="Komisaris">Komisaris</option>
+          <option value="Manager">Manager</option>
+          <option value="Head">Head / Section Head</option>
+          <option value="Staff">Staff</option>
         </select>
       </div>
       <div>
@@ -84,9 +90,9 @@
       <table class="w-full">
         <thead class="bg-black/20">
           <tr>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 30%">User</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 25%">User</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Username</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Role</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 20%">Role & Jabatan</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 10%">Status</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Date Created</th>
             <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold" style="width: 15%">Actions</th>
@@ -127,18 +133,28 @@
             <input type="email" id="user-email" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="name@company.com">
           </div>
           <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Jabatan / Position *</label>
+            <input type="text" id="user-jabatan" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g., Compliance Manager, Direktur">
+          </div>
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Role *</label>
+            <select id="user-role" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+              <option value="">Select Role...</option>
+              <option value="Superadmin">Superadmin</option>
+              <option value="Direktur">Direktur</option>
+              <option value="Komisaris">Komisaris</option>
+              <option value="Manager">Manager</option>
+              <option value="Head">Head / Section Head</option>
+              <option value="Staff">Staff</option>
+            </select>
+          </div>
+          <div>
             <label class="block text-sm font-semibold text-slate-300 mb-2">Phone/WhatsApp</label>
             <input type="tel" id="user-phone" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g.: 08121260XXXX">
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-300 mb-2">Telegram ID (Optional)</label>
             <input type="text" id="user-telegram" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g.: 28046770">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-300 mb-2">Role *</label>
-            <select id="user-role" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
-              <option value="">Select Role...</option>
-            </select>
           </div>
           <div>
             <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
@@ -156,6 +172,9 @@
                 <div class="mt-3 flex gap-2">
                   <input type="text" id="user-display-password" readonly class="flex-1 px-3 py-2 bg-black/30 border border-white/10 rounded text-sm text-slate-300 font-mono" placeholder="Password will appear here">
                   <button type="button" onclick="generateAndShowPassword()" class="px-4 py-2 bg-[#9d4edd] text-white text-sm font-semibold rounded hover:bg-[#9d4edd]/80 transition">Generate</button>
+                  <button type="button" onclick="copyPasswordToClipboard()" class="px-4 py-2 bg-white/10 text-white text-sm font-semibold rounded hover:bg-white/20 transition" title="Copy Password">
+                    <span class="material-symbols-outlined text-[18px]">content_copy</span>
+                  </button>
                 </div>
               </div>
             </div>
@@ -197,7 +216,6 @@
 <script>
   var allUsers = [];
   var filteredUsers = [];
-  var allRoles = [];
   var resetPasswordRowIndex = null;
   var tempPassword = '';
 
@@ -212,44 +230,12 @@
           filteredUsers = [...allUsers];
           renderUsers();
           updateUserStats();
-          loadRolesAsync();
         }
       })
       .withFailureHandler(function(err) {
         console.error('=== getAllUsers FAILURE ===', err);
       })
       .getAllUsers();
-  }
-
-  function loadRolesAsync() {
-    google.script.run
-      .withSuccessHandler(function(res) {
-        if (res && res.success) {
-          allRoles = res.roles || [];
-          populateRoleDropdown();
-        }
-      })
-      .getAllRoles();
-  }
-
-  function populateRoleDropdown() {
-    var select = document.getElementById('user-role');
-    var filterSelect = document.getElementById('filterRole');
-    if (!select) return;
-    
-    var currentValue = select.value;
-    select.innerHTML = '<option value="">Select Role...</option>';
-    if (filterSelect) filterSelect.innerHTML = '<option value="">All Roles</option>';
-    
-    allRoles.forEach(function(role) {
-      var roleName = role['Nama Role'] || role['Role Name'];
-      var status = (role.Status || '').toString().trim().toLowerCase();
-      if (status === 'aktif' || status === 'active') {
-        select.innerHTML += '<option value="' + roleName + '">' + roleName + '</option>';
-        if (filterSelect) filterSelect.innerHTML += '<option value="' + roleName + '">' + roleName + '</option>';
-      }
-    });
-    if (currentValue) select.value = currentValue;
   }
 
   function renderUsers() {
@@ -263,11 +249,11 @@
     }
     
     filteredUsers.forEach(function(user) {
-      // Support both Indonesian and English headers
       var fullName = user['Nama Lengkap'] || user['Full Name'] || '-';
       var username = user.Username || '-';
       var email = user.Email || '-';
       var role = user.Role || '-';
+      var jabatan = user.Jabatan || '-';
       var status = user.Status || '-';
       var dateCreated = user['Tanggal Buat'] || user['Date Created'] || '-';
       
@@ -283,7 +269,7 @@
       row.className = 'hover:bg-white/5 transition-colors';
       row.innerHTML = '<td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center text-white font-bold shadow-lg">' + initial + '</div><div><div class="font-semibold text-white">' + fullName + '</div><div class="text-xs text-slate-400">' + email + '</div></div></div></td>' +
         '<td class="p-4 font-mono text-sm text-slate-300">' + username + '</td>' +
-        '<td class="p-4"><span class="px-2 py-1 bg-white/10 text-white border border-white/20 rounded text-xs font-semibold">' + role + '</span></td>' +
+        '<td class="p-4"><div class="text-sm"><span class="px-2 py-1 bg-white/10 text-white border border-white/20 rounded text-xs font-semibold">' + role + '</span></div><div class="text-xs text-slate-400 mt-1">' + jabatan + '</div></td>' +
         '<td class="p-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ' + statusClass + '">' + status + '</span></td>' +
         '<td class="p-4 text-sm text-slate-400 whitespace-nowrap">' + dateCreated + '</td>' +
         '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
@@ -368,6 +354,23 @@
   function generateAndShowPassword() {
     tempPassword = generatePasswordClient(10);
     document.getElementById('user-display-password').value = tempPassword;
+    if (typeof showToast === 'function') showToast('New password generated!', 'info');
+  }
+
+  function copyPasswordToClipboard() {
+    var pwd = document.getElementById('user-display-password').value;
+    if (!pwd || pwd.includes('******')) {
+      if (typeof showToast === 'function') showToast('No password to copy!', 'error');
+      return;
+    }
+    navigator.clipboard.writeText(pwd).then(function() {
+      if (typeof showToast === 'function') showToast('Password copied to clipboard!', 'success');
+    }).catch(function() {
+      var input = document.getElementById('user-display-password');
+      input.select();
+      document.execCommand('copy');
+      if (typeof showToast === 'function') showToast('Password copied!', 'success');
+    });
   }
 
   function editUser(rowIndex) {
@@ -382,6 +385,7 @@
     document.getElementById('user-name').value = user['Nama Lengkap'] || user['Full Name'] || '';
     document.getElementById('user-username').value = user.Username || '';
     document.getElementById('user-email').value = user.Email || '';
+    document.getElementById('user-jabatan').value = user.Jabatan || '';
     document.getElementById('user-phone').value = user['No Telepon'] || user.Phone || '';
     document.getElementById('user-telegram').value = user['Telegram ID'] || '';
     document.getElementById('user-role').value = user.Role || '';
@@ -404,6 +408,7 @@
       'Nama Lengkap': document.getElementById('user-name').value.trim(),
       'Username': document.getElementById('user-username').value.trim(),
       'Email': document.getElementById('user-email').value.trim(),
+      'Jabatan': document.getElementById('user-jabatan').value.trim(),
       'No Telepon': document.getElementById('user-phone').value.trim(),
       'Telegram ID': document.getElementById('user-telegram').value.trim(),
       'Role': document.getElementById('user-role').value,
