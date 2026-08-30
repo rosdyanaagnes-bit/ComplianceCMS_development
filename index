@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <base target="_top">
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Compliance Activity</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+  <?!= include('style'); ?>
+</head>
+<body>
+
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-content">
+      <div class="orbit-container">
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+        <div class="orbit-ring"></div>
+      </div>
+      <div class="loading-text" id="loading-text">Processing...</div>
+      <div class="loading-dots">
+        <span></span><span></span><span></span>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast-container" class="toast-container"></div>
+  <div id="floating-dropdown" class="floating-dropdown"></div>
+
+  <div id="login-page" class="min-h-screen flex items-center justify-center p-4">
+    <div class="glass rounded-2xl w-full max-w-md p-8">
+      <div class="text-center mb-8">
+        <img src="https://i.imgur.com/G72tCKg.png" alt="Logo" class="w-20 h-20 mx-auto mb-4 object-contain">
+        <h1 class="text-3xl font-bold bg-gradient-to-r from-[#00d4aa] to-[#ff6b9d] bg-clip-text text-transparent">Compliance Activity</h1>
+        <p class="text-slate-400 text-sm mt-2">Precision alignment for high-growth teams</p>
+      </div>
+      <form onsubmit="handleLogin(event)">
+        <div class="mb-6">
+          <label class="block text-sm font-semibold mb-2">Username or Email</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">person</span>
+            <input type="text" id="login-id" class="w-full pl-10 pr-4 py-3 rounded-lg" placeholder="Enter username or email" required>
+          </div>
+        </div>
+        <div class="mb-6">
+          <label class="block text-sm font-semibold mb-2">Password</label>
+          <div class="relative">
+            <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500">lock</span>
+            <input type="password" id="login-pass" class="w-full pl-10 pr-12 py-3 rounded-lg" placeholder="••••••••" required>
+            <span class="material-symbols-outlined absolute right-3 top-1/2 -translate-y-1/2 cursor-pointer text-slate-500 hover:text-white transition" onclick="togglePassword()" id="toggle-icon">visibility</span>
+          </div>
+        </div>
+        <button type="submit" class="w-full bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-bold py-3 rounded-lg hover:opacity-90 transition shadow-lg">Sign In</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="main-app" class="hidden min-h-screen flex">
+    <aside class="sidebar" id="sidebar">
+      <div class="h-16 flex items-center px-6 border-b border-white/10 flex-shrink-0">
+        <div class="flex items-center gap-3">
+          <img src="https://i.imgur.com/G72tCKg.png" alt="Logo" class="w-8 h-8 object-contain">
+          <span class="font-bold text-lg bg-gradient-to-r from-[#00d4aa] to-[#ff6b9d] bg-clip-text text-transparent">Compliance</span>
+        </div>
+      </div>
+      <nav class="flex-1 py-4 overflow-y-auto" id="sidebar-menu"></nav>
+      <div class="p-4 border-t border-white/10 flex-shrink-0">
+        <div class="nav-item text-red-400 hover:bg-red-500/10" onclick="showLogoutModal()">
+          <span class="material-symbols-outlined mr-3">logout</span>
+          <span>Logout</span>
+        </div>
+      </div>
+    </aside>
+
+    <div class="main-content flex-1">
+      <header class="header-fixed fixed top-0 right-0 h-16 glass border-b border-white/10 flex items-center justify-between px-8 z-40" id="header">
+        <div class="flex items-center gap-4">
+          <button onclick="toggleSidebarVisibility()" class="p-2 hover:bg-white/10 rounded text-slate-400 hover:text-white transition" title="Hide/Show Sidebar">
+            <span class="material-symbols-outlined" id="sidebar-toggle-icon">chevron_right</span>
+          </button>
+          <div>
+            <div class="text-sm font-semibold" id="header-name">User</div>
+            <div class="text-xs text-slate-400" id="header-role">Role</div>
+          </div>
+          <div id="header-avatar" class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center font-bold shadow-lg">U</div>
+        </div>
+      </header>
+
+      <main class="pt-20 p-8">
+        <div id="page-dashboard" class="page active">
+          <h1 class="text-3xl font-bold mb-6">Dashboard</h1>
+          <div class="glass p-8 rounded-2xl text-center text-slate-400">Welcome to Compliance Activity</div>
+        </div>
+        
+        <?!= include('task-management'); ?>
+        <?!= include('setup-role'); ?>
+        <?!= include('config-user'); ?>
+        <?!= include('repository'); ?>
+        <?!= include('okr'); ?>
+        
+        <div id="page-config-menu" class="page">
+          <h1 class="text-3xl font-bold mb-6">Menu Settings</h1>
+          <div class="glass p-8 rounded-2xl text-center text-slate-400">Coming Soon</div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <div id="logout-modal" class="modal">
+    <div class="glass rounded-2xl p-8 max-w-md w-full mx-4 text-center">
+      <div class="w-20 h-20 bg-orange-500/20 rounded-full flex items-center justify-center mx-auto mb-4">
+        <span class="material-symbols-outlined text-orange-400 text-5xl">logout</span>
+      </div>
+      <h2 class="text-2xl font-bold mb-2">Confirm Logout</h2>
+      <p class="text-slate-400 mb-6">Are you sure you want to log out?</p>
+      <div class="flex gap-3">
+        <button onclick="closeLogoutModal()" class="flex-1 py-3 rounded-lg bg-white/5 hover:bg-white/10 transition">Cancel</button>
+        <button onclick="doLogout()" class="flex-1 py-3 rounded-lg bg-red-500 hover:bg-red-600 text-white transition">Yes, log out</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ==========================================
+    // GLOBAL VARIABLES
+    // ==========================================
+    var currentUser = null;
+    var currentActivePageId = 'dashboard';
+    var userPermissions = {};
+    var cachedMenus = null;
+
+    // ==========================================
+    // PERMISSION HELPER
+    // ==========================================
+    function hasPermission(menuName, action) {
+      if (!userPermissions || !userPermissions[menuName]) return false;
+      return userPermissions[menuName][action] === true;
+    }
+
+    // ==========================================
+    // UI HELPERS
+    // ==========================================
+    function showToast(message, type) {
+      type = type || 'info';
+      var container = document.getElementById('toast-container');
+      var toast = document.createElement('div');
+      toast.className = 'toast ' + type;
+      var icons = { success: 'check_circle', error: 'error', info: 'info' };
+      toast.innerHTML = '<span class="material-symbols-outlined">' + (icons[type] || 'info') + '</span><span>' + message + '</span>';
+      container.appendChild(toast);
+      setTimeout(function() {
+        toast.style.animation = 'slideOut 0.3s ease-out forwards';
+        setTimeout(function() { toast.remove(); }, 300);
+      }, 4000);
+    }
+
+    function showLoading(text) { 
+      document.getElementById('loading-text').textContent = text || 'Processing...'; 
+      document.getElementById('loading-overlay').classList.add('active'); 
+    }
+    function hideLoading() { 
+      document.getElementById('loading-overlay').classList.remove('active'); 
+    }
+
+    function togglePassword() {
+      var input = document.getElementById('login-pass');
+      var icon = document.getElementById('toggle-icon');
+      if (input.type === 'password') { 
+        input.type = 'text'; 
+        icon.textContent = 'visibility_off'; 
+      } else { 
+        input.type = 'password'; 
+        icon.textContent = 'visibility'; 
+      }
+    }
+
+    // ==========================================
+    // LOGIN
+    // ==========================================
+    function handleLogin(e) {
+      e.preventDefault();
+      showLoading('Verifying account...');
+      google.script.run
+        .withSuccessHandler(function(res) {
+          hideLoading();
+          if (res && res.success) {
+            currentUser = res.user;
+            document.getElementById('login-page').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            initApp();
+            showToast('Login successful! Welcome, ' + res.user.name, 'success');
+          } else {
+            var msg = 'An error occurred';
+            if (res) {
+              if (res.message === 'user_not_found') msg = 'Username or Email not registered';
+              else if (res.message === 'password_wrong') msg = 'Incorrect password';
+              else if (res.message === 'inactive') msg = 'Account is inactive';
+              else msg = res.message || msg;
+            }
+            showToast(msg, 'error');
+          }
+        })
+        .withFailureHandler(function(error) { 
+          hideLoading(); 
+          showToast('Server error: ' + error.toString(), 'error'); 
+        })
+        .loginUser(document.getElementById('login-id').value.trim(), document.getElementById('login-pass').value);
+    }
+
+    // ==========================================
+    // INIT APP (Set Default ke Dashboard)
+    // ==========================================
+    function initApp() {
+  try {
+    document.getElementById('header-name').textContent = currentUser.name;
+    document.getElementById('header-role').textContent = currentUser.role;
+    document.getElementById('header-avatar').textContent = currentUser.name.charAt(0).toUpperCase();
+    
+    currentActivePageId = 'dashboard';
+    
+    google.script.run
+      .withSuccessHandler(function(menus) {
+        cachedMenus = menus;
+        renderMenu(menus);
+        
+        // PAKSA navigasi ke dashboard dengan delay
+        setTimeout(function() {
+          navigateToPage('dashboard', null);
+        }, 100);
+      })
+      .withFailureHandler(function(err) { 
+        showToast('Failed to load menu: ' + err.toString(), 'error'); 
+      })
+      .getMenusByRole(currentUser.role);
+
+    google.script.run
+      .withSuccessHandler(function(perms) {
+        userPermissions = perms || {};
+      })
+      .getUserPermissions();
+
+  } catch (err) { 
+    showToast('Error initializing app: ' + err.toString(), 'error'); 
+  }
+}
+
+    // ==========================================
+    // RENDER MENU (DYNAMIC dari Backend)
+    // ==========================================
+    function renderMenu(menus) {
+      try {
+        var nav = document.getElementById('sidebar-menu');
+        nav.innerHTML = '';
+        
+        if (!menus) return;
+        
+        // Main Menu (Dashboard)
+        if (menus.main && menus.main.length > 0) {
+          menus.main.forEach(function(item) {
+            nav.innerHTML += '<div class="nav-item" id="nav-' + item.id + '" onclick="navigateToPage(\'' + item.id + '\', this)"><span class="material-symbols-outlined mr-3">' + item.icon + '</span><span>' + item.name + '</span></div>';
+          });
+        }
+        
+        // Task Management
+        if (menus.task && menus.task.length > 0) {
+          menus.task.forEach(function(item) {
+            nav.innerHTML += '<div class="nav-item" id="nav-' + item.id + '" onclick="navigateToPage(\'' + item.id + '\', this)"><span class="material-symbols-outlined mr-3">' + item.icon + '</span><span>' + item.name + '</span></div>';
+          });
+        }
+        
+        // Library (Repository) - dengan dropdown
+        if (menus.library && menus.library.length > 0) {
+          nav.innerHTML += '<div class="nav-item" id="nav-library" onclick="showLibraryDropdown(event)"><span class="material-symbols-outlined mr-3">folder_shared</span><span>Repository</span><span class="material-symbols-outlined" style="margin-left:auto;font-size:20px;">chevron_right</span></div>';
+        }
+        
+        // Reporting - dengan dropdown
+        if (menus.reporting && menus.reporting.length > 0) {
+          nav.innerHTML += '<div class="nav-item" id="nav-reporting" onclick="showReportingDropdown(event)"><span class="material-symbols-outlined mr-3">assessment</span><span>Reporting</span><span class="material-symbols-outlined" style="margin-left:auto;font-size:20px;">chevron_right</span></div>';
+        }
+        
+        // Configuration - dengan dropdown (hanya Superadmin atau yang punya akses)
+        if (menus.configuration && menus.configuration.length > 0) {
+          nav.innerHTML += '<div class="nav-item" id="nav-configuration" onclick="showConfigurationDropdown(event)"><span class="material-symbols-outlined mr-3">settings</span><span>Configuration</span><span class="material-symbols-outlined" style="margin-left:auto;font-size:20px;">chevron_right</span></div>';
+        }
+        
+        // Set active nav untuk dashboard
+        var activeNav = document.getElementById('nav-' + currentActivePageId);
+        if (activeNav) activeNav.classList.add('active');
+      } catch (err) { 
+        showToast('Error rendering menu: ' + err.toString(), 'error'); 
+      }
+    }
+
+    // ==========================================
+    // DROPDOWN MENUS
+    // ==========================================
+    function showLibraryDropdown(event) {
+      event.stopPropagation();
+      var dropdown = document.getElementById('floating-dropdown');
+      var navItem = document.getElementById('nav-library');
+      if (dropdown.classList.contains('show')) { dropdown.classList.remove('show'); return; }
+      
+      dropdown.innerHTML = '';
+      var items = cachedMenus && cachedMenus.library ? cachedMenus.library : [];
+      
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var isActive = (item.id === currentActivePageId) ? ' active' : '';
+        var div = document.createElement('div');
+        div.className = 'dropdown-item' + isActive;
+        div.innerHTML = '<span class="material-symbols-outlined">' + item.icon + '</span><span>' + item.name + '</span>';
+        div.onclick = function(pageId) { return function(e) { e.stopPropagation(); navigateToPage(pageId, null); dropdown.classList.remove('show'); }; }(item.id);
+        dropdown.appendChild(div);
+      }
+      var rect = navItem.getBoundingClientRect();
+      dropdown.style.left = (rect.right + 8) + 'px';
+      dropdown.style.top = rect.top + 'px';
+      dropdown.classList.add('show');
+    }
+
+    function showReportingDropdown(event) {
+      event.stopPropagation();
+      var dropdown = document.getElementById('floating-dropdown');
+      var navItem = document.getElementById('nav-reporting');
+      if (dropdown.classList.contains('show')) { dropdown.classList.remove('show'); return; }
+      
+      dropdown.innerHTML = '';
+      var items = cachedMenus && cachedMenus.reporting ? cachedMenus.reporting : [];
+      
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var isActive = (item.id === currentActivePageId) ? ' active' : '';
+        var div = document.createElement('div');
+        div.className = 'dropdown-item' + isActive;
+        div.innerHTML = '<span class="material-symbols-outlined">' + item.icon + '</span><span>' + item.name + '</span>';
+        div.onclick = function(pageId) { return function(e) { e.stopPropagation(); navigateToPage(pageId, null); dropdown.classList.remove('show'); }; }(item.id);
+        dropdown.appendChild(div);
+      }
+      var rect = navItem.getBoundingClientRect();
+      dropdown.style.left = (rect.right + 8) + 'px';
+      dropdown.style.top = rect.top + 'px';
+      dropdown.classList.add('show');
+    }
+
+    function showConfigurationDropdown(event) {
+      event.stopPropagation();
+      var dropdown = document.getElementById('floating-dropdown');
+      var navItem = document.getElementById('nav-configuration');
+      if (dropdown.classList.contains('show')) { dropdown.classList.remove('show'); return; }
+      
+      dropdown.innerHTML = '';
+      var items = cachedMenus && cachedMenus.configuration ? cachedMenus.configuration : [];
+      
+      for (var i = 0; i < items.length; i++) {
+        var item = items[i];
+        var isActive = (item.id === currentActivePageId) ? ' active' : '';
+        var div = document.createElement('div');
+        div.className = 'dropdown-item' + isActive;
+        div.innerHTML = '<span class="material-symbols-outlined">' + item.icon + '</span><span>' + item.name + '</span>';
+        div.onclick = function(pageId) { return function(e) { e.stopPropagation(); navigateToPage(pageId, null); dropdown.classList.remove('show'); }; }(item.id);
+        dropdown.appendChild(div);
+      }
+      var rect = navItem.getBoundingClientRect();
+      dropdown.style.left = (rect.right + 8) + 'px';
+      dropdown.style.top = rect.top + 'px';
+      dropdown.classList.add('show');
+    }
+
+    function closeDropdown() { 
+      document.getElementById('floating-dropdown').classList.remove('show'); 
+    }
+
+    // ==========================================
+    // NAVIGATION
+    // ==========================================
+    function navigateToPage(pageId, el, forceShow) {
+      try {
+        // Hide all pages
+        var pages = document.querySelectorAll('.page');
+        for (var i = 0; i < pages.length; i++) { 
+          pages[i].classList.remove('active'); 
+          pages[i].style.display = 'none';
+        }
+        
+        // Remove active from all nav items
+        var navItems = document.querySelectorAll('.nav-item');
+        for (var i = 0; i < navItems.length; i++) { 
+          navItems[i].classList.remove('active'); 
+        }
+        
+        // Show target page
+        var target = document.getElementById('page-' + pageId);
+        if (target) { 
+          target.style.display = 'block';
+          setTimeout(function() { target.classList.add('active'); }, 10);
+          currentActivePageId = pageId;
+        }
+        
+        // Set active nav item
+        if (el) { 
+          el.classList.add('active'); 
+        } else { 
+          var navItem = document.getElementById('nav-' + pageId); 
+          if (navItem) navItem.classList.add('active'); 
+        }
+        
+        // Initialize page specific functions
+        if (pageId === 'config-users' && typeof loadUsers === 'function') loadUsers();
+        if (pageId === 'setup-role' && typeof loadRoles === 'function') loadRoles();
+        if (pageId === 'team-okr' && typeof initOKRPage === 'function') initOKRPage();
+        if (pageId === 'tasks' && typeof initTaskPage === 'function') initTaskPage();
+        if (pageId === 'repo-policy' && typeof initRepositoryPage === 'function') initRepositoryPage(pageId);
+        if (pageId === 'repo-bi' && typeof initRepositoryPage === 'function') initRepositoryPage(pageId);
+        if (pageId === 'repo-directory' && typeof initRepositoryPage === 'function') initRepositoryPage(pageId);
+        
+      } catch (err) { 
+        console.error('Navigation error:', err);
+        showToast('Error showing page: ' + err.toString(), 'error'); 
+      }
+    }
+
+    function toggleSidebarVisibility() {
+      var sidebar = document.getElementById('sidebar');
+      var icon = document.getElementById('sidebar-toggle-icon');
+      sidebar.classList.toggle('hidden-sidebar');
+      icon.textContent = sidebar.classList.contains('hidden-sidebar') ? 'menu' : 'chevron_right';
+      closeDropdown();
+    }
+
+    document.addEventListener('click', function(e) {
+      var dropdown = document.getElementById('floating-dropdown');
+      var navConfig = document.getElementById('nav-configuration');
+      var navLib = document.getElementById('nav-library');
+      var navReporting = document.getElementById('nav-reporting');
+      
+      var isClickOutsideConfig = !navConfig || (!navConfig.contains(e.target) && e.target !== navConfig);
+      var isClickOutsideLib = !navLib || (!navLib.contains(e.target) && e.target !== navLib);
+      var isClickOutsideReporting = !navReporting || (!navReporting.contains(e.target) && e.target !== navReporting);
+      
+      if (!dropdown.contains(e.target) && isClickOutsideConfig && isClickOutsideLib && isClickOutsideReporting) { 
+        closeDropdown(); 
+      }
+    });
+
+    // ==========================================
+    // LOGOUT
+    // ==========================================
+    function showLogoutModal() { document.getElementById('logout-modal').classList.add('active'); }
+    function closeLogoutModal() { document.getElementById('logout-modal').classList.remove('active'); }
+    
+    function doLogout() {
+      closeLogoutModal();
+      showLoading('Logging out...');
+      google.script.run
+        .withSuccessHandler(function() {
+          hideLoading();
+          document.getElementById('main-app').classList.add('hidden');
+          document.getElementById('login-page').classList.remove('hidden');
+          document.getElementById('login-id').value = '';
+          document.getElementById('login-pass').value = '';
+          currentUser = null;
+          userPermissions = {};
+          cachedMenus = null;
+          currentActivePageId = 'dashboard';
+          showToast('You have successfully logged out', 'info');
+        })
+        .withFailureHandler(function(err) { 
+          hideLoading(); 
+          showToast('Failed to log out: ' + err.toString(), 'error'); 
+        })
+        .logoutUser();
+    }
+  </script>
+</body>
+</html>
