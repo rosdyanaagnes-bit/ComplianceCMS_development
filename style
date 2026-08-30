@@ -1,0 +1,173 @@
+<style>
+  /* =========================================
+     BASE & RESET
+     ========================================= */
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { min-height: 100vh; margin: 0; padding: 0; }
+  
+  body { 
+    font-family: 'Inter', sans-serif; 
+    background: linear-gradient(135deg, #1e2745 0%, #3a4a7a 50%, #1e2745 100%);
+    background-attachment: fixed;
+    color: #f8fafc; 
+    min-height: 100vh; 
+  }
+
+  /* =========================================
+     GLASSMORPHISM UTILITIES
+     ========================================= */
+  .glass { 
+    background: rgba(255, 255, 255, 0.08); 
+    backdrop-filter: blur(12px); 
+    border: 1px solid rgba(255, 255, 255, 0.12); 
+  }
+  .glass-strong { 
+    background: rgba(30, 39, 69, 0.95); 
+    backdrop-filter: blur(20px); 
+    border: 1px solid rgba(255, 255, 255, 0.15); 
+  }
+
+  /* =========================================
+     LAYOUT & SIDEBAR
+     ========================================= */
+  .sidebar { 
+    width: 260px; 
+    position: fixed; 
+    left: 0; top: 0; 
+    height: 100vh; 
+    background: rgba(255, 255, 255, 0.05); 
+    backdrop-filter: blur(12px); 
+    border-right: 1px solid rgba(255, 255, 255, 0.1); 
+    z-index: 50; 
+    display: flex; 
+    flex-direction: column; 
+    transition: transform 0.3s ease; 
+  }
+  .sidebar.hidden-sidebar { transform: translateX(-100%); }
+  
+  .main-content { 
+    margin-left: 260px; 
+    transition: margin-left 0.3s ease; 
+    min-height: 100vh;
+  }
+  .sidebar.hidden-sidebar ~ .main-content { margin-left: 0; }
+  
+  .header-fixed { left: 260px; transition: left 0.3s ease; }
+  .sidebar.hidden-sidebar ~ .main-content .header-fixed { left: 0; }
+
+  /* =========================================
+     NAVIGATION & DROPDOWN
+     ========================================= */
+  .nav-item { 
+    display: flex; align-items: center; padding: 12px 16px; margin: 4px 8px; 
+    border-radius: 8px; cursor: pointer; transition: all 0.2s; user-select: none; color: #f8fafc;
+  }
+  .nav-item:hover { background: rgba(255, 255, 255, 0.1); }
+  .nav-item.active { background: linear-gradient(135deg, #00d4aa 0%, #9d4edd 100%); }
+  
+  .floating-dropdown { 
+    position: fixed; background: rgba(15, 23, 42, 0.98); backdrop-filter: blur(20px); 
+    border: 1px solid rgba(0, 212, 170, 0.3); border-radius: 12px; padding: 8px; 
+    min-width: 220px; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5); z-index: 100; 
+    opacity: 0; transform: translateX(-10px); pointer-events: none; transition: all 0.25s ease; 
+  }
+  .floating-dropdown.show { opacity: 1; transform: translateX(0); pointer-events: auto; }
+  
+  .dropdown-item { 
+    display: flex; align-items: center; padding: 10px 12px; margin: 2px 0; 
+    border-radius: 8px; cursor: pointer; transition: all 0.2s; color: #cbd5e1; font-size: 14px; 
+  }
+  .dropdown-item:hover { background: rgba(0, 212, 170, 0.15); color: white; }
+  .dropdown-item.active { background: rgba(0, 212, 170, 0.25); color: #00d4aa; }
+  .dropdown-item .material-symbols-outlined { font-size: 18px; margin-right: 12px; }
+
+  /* =========================================
+     PAGE TRANSITIONS & MODALS
+     ========================================= */
+  .page { display: none !important; }
+  .page.active { display: block !important; animation: fadeIn 0.3s; }
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+  
+  .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); display: none; justify-content: center; align-items: center; z-index: 9999; }
+  .modal.active { display: flex; }
+
+  /* =========================================
+     UNIQUE LOADING ANIMATION (Orbit + Gradient)
+     ========================================= */
+  .loading-overlay { 
+    position: fixed; inset: 0; background: rgba(15, 23, 42, 0.95); backdrop-filter: blur(10px); 
+    display: none; justify-content: center; align-items: center; z-index: 10000; 
+  }
+  .loading-overlay.active { display: flex; }
+
+  .loading-content { text-align: center; padding: 2rem; }
+
+  /* Orbit Rings Animation */
+  .orbit-container {
+    width: 80px; height: 80px; margin: 0 auto 2rem; position: relative;
+  }
+  .orbit-ring {
+    position: absolute; border: 3px solid transparent; border-radius: 50%; animation: orbit 2s linear infinite;
+  }
+  .orbit-ring:nth-child(1) { width: 100%; height: 100%; border-top-color: #00d4aa; animation-delay: 0s; }
+  .orbit-ring:nth-child(2) { width: 70%; height: 70%; top: 15%; left: 15%; border-right-color: #9d4edd; animation-delay: -0.5s; animation-direction: reverse; }
+  .orbit-ring:nth-child(3) { width: 40%; height: 40%; top: 30%; left: 30%; border-bottom-color: #ff6b9d; animation-delay: -1s; }
+
+  @keyframes orbit { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+  /* Gradient Text Animation */
+  .loading-text {
+    font-size: 1.25rem; font-weight: 600; margin-bottom: 1rem;
+    background: linear-gradient(90deg, #00d4aa, #9d4edd, #ff6b9d, #00d4aa);
+    background-size: 300% 100%;
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+    animation: gradient-shift 3s ease infinite;
+  }
+  @keyframes gradient-shift { 0%, 100% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } }
+
+  /* Bouncing Dots */
+  .loading-dots { display: inline-flex; gap: 0.5rem; }
+  .loading-dots span {
+    width: 8px; height: 8px; border-radius: 50%; animation: bounce 1.4s ease-in-out infinite both;
+  }
+  .loading-dots span:nth-child(1) { animation-delay: -0.32s; background: #00d4aa; }
+  .loading-dots span:nth-child(2) { animation-delay: -0.16s; background: #9d4edd; }
+  .loading-dots span:nth-child(3) { animation-delay: 0s; background: #ff6b9d; }
+  @keyframes bounce { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+
+  /* =========================================
+     TOAST NOTIFICATIONS
+     ========================================= */
+  .toast-container { position: fixed; top: 20px; right: 20px; z-index: 10001; display: flex; flex-direction: column; gap: 10px; }
+  .toast { padding: 16px 24px; border-radius: 12px; font-weight: 600; font-size: 14px; animation: slideIn 0.3s ease-out; box-shadow: 0 10px 30px rgba(0,0,0,0.3); display: flex; align-items: center; gap: 10px; min-width: 300px; }
+  .toast.success { background: linear-gradient(135deg, #00d4aa 0%, #059669 100%); color: white; }
+  .toast.error { background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%); color: white; }
+  .toast.info { background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%); color: white; }
+  @keyframes slideIn { from { opacity: 0; transform: translateX(100px); } to { opacity: 1; transform: translateX(0); } }
+  @keyframes slideOut { from { opacity: 1; transform: translateX(0); } to { opacity: 0; transform: translateX(100px); } }
+
+  /* =========================================
+     FORMS & SCROLLBAR
+     ========================================= */
+  input, select { background: rgba(0,0,0,0.3) !important; border: 1px solid rgba(255,255,255,0.1) !important; color: white !important; }
+  input:focus, select:focus { border-color: #00d4aa !important; outline: none; box-shadow: 0 0 0 2px rgba(0, 212, 170, 0.2); }
+  input::placeholder { color: #94a3b8 !important; }
+  
+  ::-webkit-scrollbar { width: 6px; }
+  ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.2); border-radius: 10px; }
+  /* White calendar icon for date inputs */
+.date-input-white::-webkit-calendar-picker-indicator {
+  filter: invert(1) brightness(2);
+  cursor: pointer;
+  opacity: 0.8;
+}
+
+.date-input-white::-webkit-calendar-picker-indicator:hover {
+  opacity: 1;
+}
+
+/* Firefox support */
+.date-input-white::-moz-calendar-picker-indicator {
+  filter: invert(1) brightness(2);
+}
+</style>
