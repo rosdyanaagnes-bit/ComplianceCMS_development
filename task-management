@@ -1,0 +1,420 @@
+<div id="page-tasks" class="page">
+<div class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8">
+<div>
+<div class="flex items-center gap-2 text-[#00d4aa] font-semibold text-sm uppercase tracking-widest">
+<span class="w-8 h-[2px] bg-[#00d4aa]"></span>Operations
+</div>
+<h1 class="text-3xl font-bold text-white">Task Management</h1>
+<p class="text-slate-400 text-sm mt-1">Track and manage all tasks efficiently</p>
+</div>
+<button onclick="openTaskModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
+<span class="material-symbols-outlined">add</span>New Task
+</button>
+</div>
+
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+<div class="glass p-4 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-[#00d4aa]/20 rounded-lg flex items-center justify-center"><span class="material-symbols-outlined text-[#00d4aa]">task</span></div>
+<div><div class="text-slate-400 text-xs uppercase">Total Tasks</div><div class="text-xl font-bold text-white" id="task-stat-total">0</div></div>
+</div>
+</div>
+<div class="glass p-4 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-blue-500/20 rounded-lg flex items-center justify-center"><span class="material-symbols-outlined text-blue-400">pending</span></div>
+<div><div class="text-slate-400 text-xs uppercase">In Progress</div><div class="text-xl font-bold text-blue-400" id="task-stat-progress">0</div></div>
+</div>
+</div>
+<div class="glass p-4 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-green-500/20 rounded-lg flex items-center justify-center"><span class="material-symbols-outlined text-green-400">check_circle</span></div>
+<div><div class="text-slate-400 text-xs uppercase">Completed</div><div class="text-xl font-bold text-green-400" id="task-stat-completed">0</div></div>
+</div>
+</div>
+<div class="glass p-4 rounded-xl">
+<div class="flex items-center gap-3">
+<div class="w-10 h-10 bg-red-500/20 rounded-lg flex items-center justify-center"><span class="material-symbols-outlined text-red-400">warning</span></div>
+<div><div class="text-slate-400 text-xs uppercase">Overdue</div><div class="text-xl font-bold text-red-400" id="task-stat-overdue">0</div></div>
+</div>
+</div>
+</div>
+
+<div class="glass p-4 rounded-xl mb-6">
+<div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+<div class="md:col-span-2">
+<label class="text-xs text-slate-400 ml-1">Search Task</label>
+<div class="relative">
+<span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 text-[20px]">search</span>
+<input id="task-search" oninput="filterTasks()" class="w-full pl-10 pr-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Search by task name, category, or assigned to..." type="text">
+</div>
+</div>
+<div>
+<label class="text-xs text-slate-400 ml-1">Priority</label>
+<select id="task-filter-priority" onchange="filterTasks()" class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="">All Priorities</option>
+<option value="High">High</option>
+<option value="Medium">Medium</option>
+<option value="Low">Low</option>
+</select>
+</div>
+<div>
+<label class="text-xs text-slate-400 ml-1">Status</label>
+<select id="task-filter-status" onchange="filterTasks()" class="w-full px-4 py-2 bg-black/20 border border-white/10 rounded-lg text-sm text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="">All Status</option>
+<option value="Not Started">Not Started</option>
+<option value="In Progress">In Progress</option>
+<option value="Completed">Completed</option>
+<option value="On Hold">On Hold</option>
+</select>
+</div>
+</div>
+</div>
+
+<div class="glass rounded-2xl overflow-hidden">
+<div class="overflow-x-auto">
+<table class="w-full">
+<thead class="bg-black/20">
+<tr>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Task ID</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Main Task</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Detail Task</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Assigned To</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Priority</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Due Date</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Progress</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Status</th>
+<th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold">Deadline</th>
+<th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold">Actions</th>
+</tr>
+</thead>
+<tbody id="task-table-body" class="divide-y divide-white/5">
+<tr><td colspan="10" class="p-8 text-center text-slate-400">Loading tasks...</td></tr>
+</tbody>
+</table>
+</div>
+</div>
+</div>
+
+<div id="task-modal" class="fixed inset-0 z-[10000] hidden">
+<div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeTaskModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+<div class="glass rounded-2xl shadow-2xl max-w-5xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+<div class="border-b border-white/10 p-6 flex justify-between items-center sticky top-0 bg-[#1e2745] z-10">
+<h2 class="text-2xl font-bold text-white" id="task-modal-title">New Task</h2>
+<button onclick="closeTaskModal()" class="p-2 hover:bg-white/10 rounded-lg transition"><span class="material-symbols-outlined text-slate-400">close</span></button>
+</div>
+<form id="task-form" onsubmit="saveTask(event)" class="p-6">
+<input type="hidden" id="task-row-index">
+
+<div class="space-y-6">
+<div>
+<h3 class="text-sm font-semibold text-[#00d4aa] uppercase tracking-wider mb-3">Task Information</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div class="md:col-span-2">
+<label class="block text-sm font-semibold text-slate-300 mb-2">Main Task *</label>
+<input type="text" id="task-main" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Enter main task title">
+</div>
+<div class="md:col-span-2">
+<label class="block text-sm font-semibold text-slate-300 mb-2">Detail Task *</label>
+<textarea id="task-detail" required rows="3" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Describe the task in detail..."></textarea>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Category *</label>
+<select id="task-category" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="">Select Category...</option>
+<option value="Compliance">Compliance</option>
+<option value="Audit">Audit</option>
+<option value="Report">Report</option>
+<option value="Review">Review</option>
+<option value="Meeting">Meeting</option>
+<option value="Documentation">Documentation</option>
+<option value="Other">Other</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Activity Type *</label>
+<select id="task-activity" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="">Select Type...</option>
+<option value="Routine">Routine</option>
+<option value="Project">Project</option>
+<option value="Ad-hoc">Ad-hoc</option>
+<option value="Urgent">Urgent</option>
+</select>
+</div>
+</div>
+</div>
+
+<div>
+<h3 class="text-sm font-semibold text-[#00d4aa] uppercase tracking-wider mb-3">Assignment & Timeline</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Assigned By *</label>
+<input type="text" id="task-assigned-by" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Who assigns this task">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Delegation To *</label>
+<input type="text" id="task-delegation" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Who will execute">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Priority *</label>
+<select id="task-priority" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="Medium">Medium</option>
+<option value="High">High</option>
+<option value="Low">Low</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Due Date *</label>
+<input type="date" id="task-due-date" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Target Duration</label>
+<input type="text" id="task-duration" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="e.g., 3 days, 1 week">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Business Model</label>
+<input type="text" id="task-business" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Related business model">
+</div>
+</div>
+</div>
+
+<div>
+<h3 class="text-sm font-semibold text-[#00d4aa] uppercase tracking-wider mb-3">Progress & Status</h3>
+<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Status Task *</label>
+<select id="task-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+<option value="Not Started">Not Started</option>
+<option value="In Progress">In Progress</option>
+<option value="Completed">Completed</option>
+<option value="On Hold">On Hold</option>
+</select>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Progress (%)</label>
+<input type="number" id="task-progress" min="0" max="100" value="0" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Actual Finish</label>
+<input type="date" id="task-actual-finish" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+</div>
+</div>
+</div>
+
+<div>
+<h3 class="text-sm font-semibold text-[#00d4aa] uppercase tracking-wider mb-3">Review & Approval</h3>
+<div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Reviewer Notes</label>
+<textarea id="task-reviewer-notes" rows="2" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Notes from reviewer..."></textarea>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Action Log</label>
+<textarea id="task-action-log" rows="2" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Log of actions taken..."></textarea>
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Reviewed By</label>
+<input type="text" id="task-reviewed-by" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Reviewer name">
+</div>
+<div>
+<label class="block text-sm font-semibold text-slate-300 mb-2">Approval By</label>
+<input type="text" id="task-approval-by" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Approver name">
+</div>
+</div>
+</div>
+</div>
+
+<div class="mt-6 flex gap-3 sticky bottom-0 bg-[#1e2745] pt-4 border-t border-white/10">
+<button type="button" id="btn-delete-task" onclick="deleteTaskFromModal()" class="flex-1 py-3 rounded-lg font-semibold text-red-400 bg-red-500/10 hover:bg-red-500/20 border border-red-500/30 transition hidden">Delete</button>
+<button type="button" onclick="closeTaskModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+<button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition">Save Task</button>
+</div>
+</form>
+</div>
+</div>
+</div>
+
+<div id="task-delete-modal" class="fixed inset-0 z-[10001] hidden">
+<div class="fixed inset-0 bg-black/80 backdrop-blur-sm" onclick="closeTaskDeleteModal()"></div>
+<div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
+<div class="glass rounded-2xl shadow-2xl max-w-md w-full border border-red-500/30 pointer-events-auto bg-[#1e2745]">
+<div class="p-6 text-center">
+<div class="w-16 h-16 bg-red-500/20 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-red-500/50"><span class="material-symbols-outlined text-red-400 text-[48px]">warning</span></div>
+<h3 class="text-xl font-bold text-white mb-2">Delete Task?</h3>
+<p class="text-slate-400 text-sm mb-6">This action cannot be undone.</p>
+<div class="bg-black/30 rounded-xl p-4 mb-6 border border-white/10">
+<p class="text-xs text-slate-500 uppercase font-semibold mb-1">Task</p>
+<p class="text-white font-semibold" id="delete-task-name">-</p>
+</div>
+<div class="flex gap-3">
+<button onclick="closeTaskDeleteModal()" class="flex-1 py-3 px-4 rounded-xl font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
+<button onclick="confirmDeleteTask()" class="flex-1 py-3 px-4 rounded-xl font-semibold text-white bg-gradient-to-r from-red-500 to-red-600 hover:from-red-600 hover:to-red-700 shadow-[0_0_20px_rgba(239,68,68,0.3)] transition">Yes, Delete</button>
+</div>
+</div>
+</div>
+</div>
+</div>
+
+<script>
+var taskData = [];
+var deleteTaskIndex = null;
+
+window.initTaskPage = function() { loadTaskData(); };
+
+function loadTaskData() {
+  google.script.run.withSuccessHandler(function(res) {
+    if (res && res.success) {
+      taskData = res.tasks || [];
+      renderTaskTable(taskData);
+      updateTaskStats();
+    }
+  }).getTaskData();
+}
+
+function updateTaskStats() {
+  document.getElementById('task-stat-total').textContent = taskData.length;
+  document.getElementById('task-stat-progress').textContent = taskData.filter(function(t) { return t.StatusTask === 'In Progress'; }).length;
+  document.getElementById('task-stat-completed').textContent = taskData.filter(function(t) { return t.StatusTask === 'Completed'; }).length;
+  document.getElementById('task-stat-overdue').textContent = taskData.filter(function(t) { return t.DeadlineStatus === 'Overdue'; }).length;
+}
+
+function renderTaskTable(data) {
+  var tbody = document.getElementById('task-table-body');
+  if (!tbody) return;
+  tbody.innerHTML = '';
+  if (data.length === 0) {
+    tbody.innerHTML = '<tr><td colspan="10" class="p-8 text-center text-slate-400">No tasks found</td></tr>';
+    return;
+  }
+  data.forEach(function(task) {
+    var priorityClass = task.Priority === 'High' ? 'bg-red-500/20 text-red-400' : task.Priority === 'Medium' ? 'bg-yellow-500/20 text-yellow-400' : 'bg-blue-500/20 text-blue-400';
+    var statusClass = task.StatusTask === 'Completed' ? 'bg-green-500/20 text-green-400' : task.StatusTask === 'In Progress' ? 'bg-blue-500/20 text-blue-400' : task.StatusTask === 'On Hold' ? 'bg-orange-500/20 text-orange-400' : 'bg-slate-500/20 text-slate-400';
+    var deadlineClass = task.DeadlineStatus === 'Overdue' ? 'text-red-400' : task.DeadlineStatus === 'Due Soon' ? 'text-yellow-400' : 'text-green-400';
+    var progressColor = task.Progress >= 75 ? 'bg-green-500' : task.Progress >= 50 ? 'bg-yellow-500' : task.Progress >= 25 ? 'bg-blue-500' : 'bg-red-500';
+    var row = document.createElement('tr');
+    row.className = 'hover:bg-white/5 transition-colors';
+    row.innerHTML = '<td class="p-4 text-sm text-slate-300 font-mono">' + (task.SubTaskID || '-') + '</td>' +
+      '<td class="p-4 text-sm text-white font-medium truncate max-w-[200px]" title="' + (task.MainTask || '') + '">' + (task.MainTask || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300 truncate max-w-[200px]" title="' + (task.DetailTask || '') + '">' + (task.DetailTask || '-') + '</td>' +
+      '<td class="p-4 text-sm text-slate-300">' + (task.DelegationTo || '-') + '</td>' +
+      '<td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ' + priorityClass + '">' + (task.Priority || '-') + '</span></td>' +
+      '<td class="p-4 text-sm text-slate-300 whitespace-nowrap">' + (task.DueDate || '-') + '</td>' +
+      '<td class="p-4"><div class="flex items-center gap-2"><div class="w-16 h-2 bg-white/10 rounded-full overflow-hidden"><div class="' + progressColor + ' h-full rounded-full" style="width: ' + (task.Progress || 0) + '%"></div></div><span class="text-xs text-slate-400">' + (task.Progress || 0) + '%</span></div></td>' +
+      '<td class="p-4"><span class="px-2 py-1 rounded text-xs font-semibold ' + statusClass + '">' + (task.StatusTask || '-') + '</span></td>' +
+      '<td class="p-4 text-sm ' + deadlineClass + ' font-semibold whitespace-nowrap">' + (task.DeadlineStatus || '-') + '</td>' +
+      '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
+        '<button onclick="editTask(' + task.rowIndex + ')" class="p-2 text-[#9d4edd] hover:bg-[#9d4edd]/10 rounded-lg" title="Edit"><span class="material-symbols-outlined text-[18px]">edit</span></button>' +
+      '</div></td>';
+    tbody.appendChild(row);
+  });
+}
+
+function filterTasks() {
+  var search = document.getElementById('task-search').value.toLowerCase();
+  var priorityFilter = document.getElementById('task-filter-priority').value;
+  var statusFilter = document.getElementById('task-filter-status').value;
+  var filtered = taskData.filter(function(task) {
+    var matchSearch = !search || (task.MainTask && task.MainTask.toLowerCase().includes(search)) || (task.DetailTask && task.DetailTask.toLowerCase().includes(search)) || (task.DelegationTo && task.DelegationTo.toLowerCase().includes(search)) || (task.Category && task.Category.toLowerCase().includes(search));
+    var matchPriority = !priorityFilter || task.Priority === priorityFilter;
+    var matchStatus = !statusFilter || task.StatusTask === statusFilter;
+    return matchSearch && matchPriority && matchStatus;
+  });
+  renderTaskTable(filtered);
+}
+
+function openTaskModal() {
+  document.getElementById('task-modal-title').textContent = 'New Task';
+  document.getElementById('task-form').reset();
+  document.getElementById('task-row-index').value = '';
+  document.getElementById('task-progress').value = '0';
+  document.getElementById('btn-delete-task').classList.add('hidden');
+  document.getElementById('task-modal').classList.remove('hidden');
+}
+
+function closeTaskModal() { document.getElementById('task-modal').classList.add('hidden'); }
+
+function editTask(rowIndex) {
+  var task = taskData.find(function(t) { return t.rowIndex === rowIndex; });
+  if (!task) return;
+  document.getElementById('task-modal-title').textContent = 'Edit Task';
+  document.getElementById('task-row-index').value = task.rowIndex;
+  document.getElementById('task-main').value = task.MainTask || '';
+  document.getElementById('task-detail').value = task.DetailTask || '';
+  document.getElementById('task-category').value = task.Category || '';
+  document.getElementById('task-activity').value = task.ActivityType || '';
+  document.getElementById('task-assigned-by').value = task.AssignedBy || '';
+  document.getElementById('task-delegation').value = task.DelegationTo || '';
+  document.getElementById('task-priority').value = task.Priority || 'Medium';
+  document.getElementById('task-due-date').value = task.DueDate || '';
+  document.getElementById('task-duration').value = task.TargetDuration || '';
+  document.getElementById('task-business').value = task.BusinessModel || '';
+  document.getElementById('task-status').value = task.StatusTask || 'Not Started';
+  document.getElementById('task-progress').value = task.Progress || 0;
+  document.getElementById('task-actual-finish').value = task.ActualFinish || '';
+  document.getElementById('task-reviewer-notes').value = task.ReviewerNotes || '';
+  document.getElementById('task-action-log').value = task.ActionLog || '';
+  document.getElementById('task-reviewed-by').value = task.ReviewedBy || '';
+  document.getElementById('task-approval-by').value = task.ApprovalBy || '';
+  document.getElementById('btn-delete-task').classList.remove('hidden');
+  document.getElementById('task-modal').classList.remove('hidden');
+}
+
+function saveTask(e) {
+  e.preventDefault();
+  if (typeof showLoading === 'function') showLoading('Saving task...');
+  var rowIndex = document.getElementById('task-row-index').value;
+  var payload = {
+    MainTask: document.getElementById('task-main').value,
+    DetailTask: document.getElementById('task-detail').value,
+    Category: document.getElementById('task-category').value,
+    ActivityType: document.getElementById('task-activity').value,
+    AssignedBy: document.getElementById('task-assigned-by').value,
+    DelegationTo: document.getElementById('task-delegation').value,
+    Priority: document.getElementById('task-priority').value,
+    DueDate: document.getElementById('task-due-date').value,
+    TargetDuration: document.getElementById('task-duration').value,
+    BusinessModel: document.getElementById('task-business').value,
+    StatusTask: document.getElementById('task-status').value,
+    Progress: parseInt(document.getElementById('task-progress').value) || 0,
+    ActualFinish: document.getElementById('task-actual-finish').value,
+    ReviewerNotes: document.getElementById('task-reviewer-notes').value,
+    ActionLog: document.getElementById('task-action-log').value,
+    ReviewedBy: document.getElementById('task-reviewed-by').value,
+    ApprovalBy: document.getElementById('task-approval-by').value
+  };
+  google.script.run.withSuccessHandler(function(res) {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (res && res.success) { closeTaskModal(); loadTaskData(); if (typeof showToast === 'function') showToast(res.message, 'success'); }
+    else { if (typeof showToast === 'function') showToast(res.message || 'Failed', 'error'); }
+  }).withFailureHandler(function(err) {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+  }).saveTask(rowIndex, payload);
+}
+
+function deleteTaskFromModal() {
+  var rowIndex = document.getElementById('task-row-index').value;
+  if (!rowIndex) return;
+  var task = taskData.find(function(t) { return t.rowIndex == rowIndex; });
+  document.getElementById('delete-task-name').textContent = task ? (task.MainTask || '-') : '-';
+  deleteTaskIndex = rowIndex;
+  document.getElementById('task-modal').classList.add('hidden');
+  document.getElementById('task-delete-modal').classList.remove('hidden');
+}
+
+function closeTaskDeleteModal() { document.getElementById('task-delete-modal').classList.add('hidden'); deleteTaskIndex = null; }
+
+function confirmDeleteTask() {
+  if (!deleteTaskIndex) return;
+  if (typeof showLoading === 'function') showLoading('Deleting task...');
+  document.getElementById('task-delete-modal').classList.add('hidden');
+  google.script.run.withSuccessHandler(function(res) {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (res && res.success) { loadTaskData(); if (typeof showToast === 'function') showToast('Task deleted', 'success'); }
+    else { if (typeof showToast === 'function') showToast(res.message || 'Failed', 'error'); }
+  }).withFailureHandler(function(err) {
+    if (typeof hideLoading === 'function') hideLoading();
+    if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+  }).deleteTask(parseInt(deleteTaskIndex));
+}
+</script>
