@@ -5,7 +5,7 @@
         <span class="w-8 h-[2px] bg-[#00d4aa]"></span>Configuration
       </div>
       <h1 class="text-3xl font-bold text-white">Role Setup</h1>
-      <p class="text-slate-400 text-sm mt-1">Manage roles and user access permissions</p>
+      <p class="text-slate-400 text-sm mt-1">Manage roles and granular access permissions</p>
     </div>
     <div class="flex gap-3">
       <button onclick="openCreateRoleModal()" class="flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] text-white font-semibold rounded-full hover:opacity-90 shadow-[0_0_15px_rgba(0,212,170,0.3)] transition">
@@ -80,7 +80,7 @@
           <tr>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 20%">Role</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 25%">Description</th>
-            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 30%">Menu Access</th>
+            <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 30%">Permission Summary</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 10%">Status</th>
             <th class="p-4 text-left text-slate-400 text-xs uppercase font-semibold" style="width: 10%">Created Date</th>
             <th class="p-4 text-right text-slate-400 text-xs uppercase font-semibold" style="width: 5%">Actions</th>
@@ -98,8 +98,8 @@
 <div id="role-modal" class="fixed inset-0 z-[10000] hidden">
   <div class="fixed inset-0 bg-black/70 backdrop-blur-sm" onclick="closeRoleModal()"></div>
   <div class="fixed inset-0 flex items-center justify-center p-4 pointer-events-none">
-    <div class="glass rounded-2xl shadow-2xl max-w-2xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
-      <div class="border-b border-white/10 p-6 flex justify-between items-center">
+    <div class="glass rounded-2xl shadow-2xl max-w-4xl w-full border border-white/10 max-h-[90vh] overflow-y-auto pointer-events-auto bg-[#1e2745]">
+      <div class="border-b border-white/10 p-6 flex justify-between items-center sticky top-0 bg-[#1e2745] z-10">
         <h2 class="text-2xl font-bold text-white" id="role-modal-title">Add New Role</h2>
         <button onclick="closeRoleModal()" class="p-2 hover:bg-white/10 rounded-lg transition">
           <span class="material-symbols-outlined text-slate-400">close</span>
@@ -107,53 +107,50 @@
       </div>
       <form id="role-form" onsubmit="saveRole(event)" class="p-6">
         <input type="hidden" id="role-row-index">
-        <div class="space-y-4">
-          <div>
-            <label class="block text-sm font-semibold text-slate-300 mb-2">Role Name *</label>
-            <input type="text" id="role-name" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="e.g., Finance Manager">
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-300 mb-2">Description</label>
-            <textarea id="role-description" rows="3" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa] placeholder-slate-500" placeholder="Brief description about this role..."></textarea>
-          </div>
-          <div>
-            <label class="block text-sm font-semibold text-slate-300 mb-2">Menu Access *</label>
-            <div class="grid grid-cols-2 gap-3 p-4 bg-black/20 border border-white/10 rounded-lg">
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="Dashboard" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">Dashboard</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="Task Management" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">Task Management</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="Repository" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">Repository</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="Team OKR" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">Team OKR</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="User Management" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">User Management</span>
-              </label>
-              <label class="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" name="menu-access" value="Menu Settings" class="w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]">
-                <span class="text-slate-300 text-sm">Menu Settings</span>
-              </label>
+        <div class="space-y-6">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block text-sm font-semibold text-slate-300 mb-2">Role Name *</label>
+              <input type="text" id="role-name" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="e.g., Compliance Manager">
+            </div>
+            <div>
+              <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
+              <select id="role-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
+                <option value="Aktif">Aktif</option>
+                <option value="Nonaktif">Nonaktif</option>
+              </select>
             </div>
           </div>
           <div>
-            <label class="block text-sm font-semibold text-slate-300 mb-2">Status *</label>
-            <select id="role-status" required class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]">
-              <option value="Aktif">Aktif</option>
-              <option value="Nonaktif">Nonaktif</option>
-            </select>
+            <label class="block text-sm font-semibold text-slate-300 mb-2">Description</label>
+            <textarea id="role-description" rows="2" class="w-full px-4 py-3 bg-black/20 border border-white/10 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-[#00d4aa]" placeholder="Brief description about this role..."></textarea>
+          </div>
+
+          <!-- PERMISSION MATRIX -->
+          <div>
+            <label class="block text-sm font-semibold text-slate-300 mb-3">Permission Matrix (Check allowed actions per menu)</label>
+            <div class="overflow-x-auto border border-white/10 rounded-lg">
+              <table class="w-full text-sm">
+                <thead class="bg-black/30 text-slate-400">
+                  <tr>
+                    <th class="p-3 text-left font-semibold">Menu Name</th>
+                    <th class="p-3 text-center font-semibold">View</th>
+                    <th class="p-3 text-center font-semibold">Create</th>
+                    <th class="p-3 text-center font-semibold">Edit</th>
+                    <th class="p-3 text-center font-semibold">Delete</th>
+                    <th class="p-3 text-center font-semibold text-[#00d4aa]">Review</th>
+                    <th class="p-3 text-center font-semibold text-[#9d4edd]">Approve</th>
+                  </tr>
+                </thead>
+                <tbody id="permission-matrix-body" class="divide-y divide-white/5">
+                  <!-- Generated by JS -->
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
-        <div class="mt-6 flex gap-3">
+
+        <div class="mt-6 flex gap-3 sticky bottom-0 bg-[#1e2745] pt-4 border-t border-white/10">
           <button type="button" onclick="closeRoleModal()" class="flex-1 py-3 rounded-lg font-semibold text-slate-300 bg-white/5 hover:bg-white/10 border border-white/10 transition">Cancel</button>
           <button type="submit" class="flex-1 py-3 rounded-lg font-semibold text-white bg-gradient-to-r from-[#00d4aa] to-[#9d4edd] hover:opacity-90 transition shadow-[0_0_15px_rgba(0,212,170,0.3)]">Save Role</button>
         </div>
@@ -165,39 +162,38 @@
 <script>
   var allRoles = [];
   var filteredRoles = [];
+  
+  // DAFTAR MENU (Tambahkan menu baru di sini jika ada fitur baru di masa depan)
+  var AVAILABLE_MENUS = [
+  'Dashboard', 
+  'Task Management', 
+  'Repository', 
+  'Reporting OKR', 
+  'User Management', 
+  'Role Setup',
+  'Menu Settings'
+];
+
+  window.initSetupRolePage = function() { loadRoles(); };
 
   function loadRoles() {
-    console.log('=== setup-role: loadRoles START ===');
-    
-    google.script.run
-      .withSuccessHandler(function(res) {
-        console.log('=== setup-role: getAllRoles response ===', res);
-        
-        if (res && res.success) {
-          allRoles = res.roles || [];
-          console.log('setup-role: Total roles loaded:', allRoles.length);
-          filteredRoles = [...allRoles];
-          renderRoles();
-          updateRoleStats();
-          console.log('setup-role: Stats updated');
-        } else {
-          console.error('setup-role: Error loading roles:', res ? res.message : 'Unknown');
-          if (typeof showToast === 'function') showToast(res && res.message ? res.message : 'Failed to load data', 'error');
-        }
-      })
-      .withFailureHandler(function(err) {
-        console.error('=== setup-role: getAllRoles FAILURE ===', err);
-        if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
-      })
-      .getAllRoles();
+    google.script.run.withSuccessHandler(function(res) {
+      if (res && res.success) {
+        allRoles = res.roles || [];
+        filteredRoles = [...allRoles];
+        renderRoles();
+        updateRoleStats();
+      } else {
+        if (typeof showToast === 'function') showToast(res ? res.message : 'Failed to load', 'error');
+      }
+    }).withFailureHandler(function(err) {
+      if (typeof showToast === 'function') showToast('Error: ' + err.toString(), 'error');
+    }).getAllRoles();
   }
 
   function renderRoles() {
     var tbody = document.getElementById('role-table-body');
-    if (!tbody) {
-      console.error('setup-role: role-table-body not found!');
-      return;
-    }
+    if (!tbody) return;
     tbody.innerHTML = '';
     
     if (filteredRoles.length === 0) {
@@ -206,115 +202,97 @@
     }
     
     filteredRoles.forEach(function(role) {
-      // Support both Indonesian and English headers
       var roleName = role['Nama Role'] || role['Role Name'] || '-';
       var description = role.Deskripsi || role.Description || '-';
       var createdDate = role['Tanggal Buat'] || role['Created Date'] || '-';
       var status = role.Status || '-';
-      
-      var statusStr = status.toString().trim().toLowerCase();
-      var statusClass = statusStr === 'aktif' || statusStr === 'active'
-        ? 'bg-green-500/20 text-green-400 border-green-500/30' 
-        : 'bg-red-500/20 text-red-400 border-red-500/30';
-      
+      var statusClass = (status.toString().trim().toLowerCase() === 'aktif' || status.toString().trim().toLowerCase() === 'active') ? 'bg-green-500/20 text-green-400 border-green-500/30' : 'bg-red-500/20 text-red-400 border-red-500/30';
       var initial = roleName.charAt(0).toUpperCase();
       
-      var menuAccess = role['Menu Access'] || '';
-      var menuList = '';
-      if (menuAccess) {
-        try {
-          var menus = typeof menuAccess === 'string' ? JSON.parse(menuAccess) : menuAccess;
-          menuList = menus.map(function(m) {
-            return '<span class="inline-block px-2 py-1 bg-[#00d4aa]/20 text-[#00d4aa] border border-[#00d4aa]/30 rounded text-xs mr-1 mb-1">' + m + '</span>';
-          }).join('');
-        } catch (e) {
-          menuList = '<span class="text-slate-400 text-xs">' + menuAccess + '</span>';
+      // Parse permission summary for table view
+      var permSummary = '-';
+      try {
+        var perms = typeof role['Menu Access'] === 'string' ? JSON.parse(role['Menu Access']) : role['Menu Access'];
+        if (perms && typeof perms === 'object' && !Array.isArray(perms)) {
+          // New format: count how many menus have 'view' access
+          var activeMenus = Object.keys(perms).filter(function(m) { return perms[m].view; });
+          permSummary = activeMenus.length > 0 ? activeMenus.slice(0, 3).join(', ') + (activeMenus.length > 3 ? '...' : '') : '-';
+        } else if (Array.isArray(perms)) {
+          // Old format (backward compatibility)
+          permSummary = perms.slice(0, 3).join(', ') + (perms.length > 3 ? '...' : '');
         }
-      } else {
-        menuList = '<span class="text-slate-500 text-xs">-</span>';
+      } catch(e) { 
+        permSummary = role['Menu Access'] || '-'; 
       }
-      
+
       var rowIndex = role.rowIndex;
-      
       var row = document.createElement('tr');
       row.className = 'hover:bg-white/5 transition-colors';
       row.innerHTML = '<td class="p-4"><div class="flex items-center gap-3"><div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#00d4aa] to-[#9d4edd] flex items-center justify-center text-white font-bold">' + initial + '</div><div><div class="font-semibold text-white">' + roleName + '</div><div class="text-xs text-slate-400">Role</div></div></div></td>' +
         '<td class="p-4 text-sm text-slate-300 max-w-xs truncate" title="' + description + '">' + description + '</td>' +
-        '<td class="p-4"><div class="flex flex-wrap gap-1">' + menuList + '</div></td>' +
+        '<td class="p-4 text-sm text-slate-300">' + permSummary + '</td>' +
         '<td class="p-4"><span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold border ' + statusClass + '">' + status + '</span></td>' +
         '<td class="p-4 text-sm text-slate-400 whitespace-nowrap">' + createdDate + '</td>' +
         '<td class="p-4 text-right"><div class="flex justify-end gap-1">' +
-          '<button onclick="editRole(' + rowIndex + ')" class="p-2 text-[#9d4edd] hover:bg-[#9d4edd]/10 rounded-lg transition group" title="Edit">' +
-            '<span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">edit</span>' +
-          '</button>' +
+          '<button onclick="editRole(' + rowIndex + ')" class="p-2 text-[#9d4edd] hover:bg-[#9d4edd]/10 rounded-lg transition group" title="Edit"><span class="material-symbols-outlined text-[18px] group-hover:scale-110 transition-transform">edit</span></button>' +
         '</div></td>';
       tbody.appendChild(row);
     });
   }
 
   function updateRoleStats() {
-    var totalEl = document.getElementById('stat-total-roles');
-    var activeEl = document.getElementById('stat-active-roles');
-    var inactiveEl = document.getElementById('stat-inactive-roles');
-    
-    if (!allRoles || allRoles.length === 0) {
-      if (totalEl) totalEl.textContent = '0';
-      if (activeEl) activeEl.textContent = '0';
-      if (inactiveEl) inactiveEl.textContent = '0';
-      return;
-    }
-
-    var total = allRoles.length;
-    var activeCount = 0;
-    var inactiveCount = 0;
-
-    allRoles.forEach(function(r) {
-      var status = (r.Status || '').toString().trim().toLowerCase();
-      if (status === 'aktif' || status === 'active') {
-        activeCount++;
-      } else if (status === 'nonaktif' || status === 'inactive') {
-        inactiveCount++;
-      }
-    });
-
-    if (totalEl) totalEl.textContent = total;
-    if (activeEl) activeEl.textContent = activeCount;
-    if (inactiveEl) inactiveEl.textContent = inactiveCount;
-    
-    console.log('Stats updated - Total:', total, 'Active:', activeCount, 'Inactive:', inactiveCount);
+    document.getElementById('stat-total-roles').textContent = allRoles.length;
+    document.getElementById('stat-active-roles').textContent = allRoles.filter(function(r) { return (r.Status || '').toString().trim().toLowerCase() === 'aktif' || (r.Status || '').toString().trim().toLowerCase() === 'active'; }).length;
+    document.getElementById('stat-inactive-roles').textContent = allRoles.filter(function(r) { return (r.Status || '').toString().trim().toLowerCase() === 'nonaktif' || (r.Status || '').toString().trim().toLowerCase() === 'inactive'; }).length;
   }
 
   function filterRoles() {
     var search = document.getElementById('searchRole').value.toLowerCase();
     var statusFilter = document.getElementById('filterRoleStatus').value;
-    
     filteredRoles = allRoles.filter(function(role) {
       var name = (role['Nama Role'] || role['Role Name'] || '').toString().toLowerCase();
       var desc = (role.Deskripsi || role.Description || '').toString().toLowerCase();
       var matchSearch = !search || name.includes(search) || desc.includes(search);
-      
-      var status = (role.Status || '').toString().trim();
-      var matchStatus = !statusFilter || status === statusFilter;
-      
+      var matchStatus = !statusFilter || (role.Status || '').toString().trim() === statusFilter;
       return matchSearch && matchStatus;
     });
     renderRoles();
+  }
+
+  // RENDER PERMISSION MATRIX IN MODAL
+  function renderPermissionMatrix(currentPerms) {
+    var tbody = document.getElementById('permission-matrix-body');
+    tbody.innerHTML = '';
+    
+    AVAILABLE_MENUS.forEach(function(menu) {
+      // Get permissions for this menu, default to false
+      var p = (currentPerms && currentPerms[menu]) ? currentPerms[menu] : {};
+      
+      var tr = document.createElement('tr');
+      tr.className = 'hover:bg-white/5 transition-colors';
+      tr.innerHTML = 
+        '<td class="p-3 font-medium text-white">' + menu + '</td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]" data-menu="' + menu + '" data-perm="view" ' + (p.view ? 'checked' : '') + '></td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]" data-menu="' + menu + '" data-perm="create" ' + (p.create ? 'checked' : '') + '></td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]" data-menu="' + menu + '" data-perm="edit" ' + (p.edit ? 'checked' : '') + '></td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]" data-menu="' + menu + '" data-perm="delete" ' + (p.delete ? 'checked' : '') + '></td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#00d4aa] focus:ring-[#00d4aa]" data-menu="' + menu + '" data-perm="review" ' + (p.review ? 'checked' : '') + '></td>' +
+        '<td class="p-3 text-center"><input type="checkbox" class="perm-cb w-4 h-4 rounded bg-black/30 border-white/20 text-[#9d4edd] focus:ring-[#9d4edd]" data-menu="' + menu + '" data-perm="approve" ' + (p.approve ? 'checked' : '') + '></td>';
+      tbody.appendChild(tr);
+    });
   }
 
   function openCreateRoleModal() {
     document.getElementById('role-modal-title').textContent = 'Add New Role';
     document.getElementById('role-form').reset();
     document.getElementById('role-row-index').value = '';
+    renderPermissionMatrix({}); // Empty matrix for new role
     document.getElementById('role-modal').classList.remove('hidden');
   }
 
   function editRole(rowIndex) {
-    console.log('Editing role rowIndex:', rowIndex);
     var role = allRoles.find(function(r) { return r.rowIndex === rowIndex; });
-    if (!role) {
-      if (typeof showToast === 'function') showToast('Role not found', 'error');
-      return;
-    }
+    if (!role) return;
     
     document.getElementById('role-modal-title').textContent = 'Edit Role';
     document.getElementById('role-row-index').value = role.rowIndex;
@@ -322,41 +300,47 @@
     document.getElementById('role-description').value = role.Deskripsi || role.Description || '';
     document.getElementById('role-status').value = role.Status || 'Aktif';
     
-    var checkboxes = document.querySelectorAll('input[name="menu-access"]');
-    checkboxes.forEach(function(cb) { cb.checked = false; });
-    
-    if (role['Menu Access']) {
-      try {
-        var menus = typeof role['Menu Access'] === 'string' ? JSON.parse(role['Menu Access']) : role['Menu Access'];
-        checkboxes.forEach(function(cb) {
-          if (menus.indexOf(cb.value) !== -1) cb.checked = true;
-        });
-      } catch (e) {
-        console.error('Error parsing menu access', e);
+    // Parse existing permissions
+    var currentPerms = {};
+    try {
+      var parsed = typeof role['Menu Access'] === 'string' ? JSON.parse(role['Menu Access']) : role['Menu Access'];
+      if (Array.isArray(parsed)) {
+        // Migrate old array format to new object format automatically
+        parsed.forEach(function(m) { currentPerms[m] = { view: true, create: true, edit: true }; });
+      } else {
+        currentPerms = parsed || {};
       }
-    }
+    } catch(e) {}
     
+    renderPermissionMatrix(currentPerms);
     document.getElementById('role-modal').classList.remove('hidden');
   }
 
-  function closeRoleModal() {
-    document.getElementById('role-modal').classList.add('hidden');
-  }
+  function closeRoleModal() { document.getElementById('role-modal').classList.add('hidden'); }
 
   function saveRole(e) {
     e.preventDefault();
     if (typeof showLoading === 'function') showLoading('Saving role...');
     
     var rowIndex = document.getElementById('role-row-index').value;
-    var menuAccess = [];
-    document.querySelectorAll('input[name="menu-access"]:checked').forEach(function(cb) {
-      menuAccess.push(cb.value);
+    
+    // Build Permission Matrix Object
+    var permMatrix = {};
+    AVAILABLE_MENUS.forEach(function(menu) {
+      permMatrix[menu] = {
+        view: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="view"]').checked,
+        create: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="create"]').checked,
+        edit: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="edit"]').checked,
+        delete: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="delete"]').checked,
+        review: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="review"]').checked,
+        approve: document.querySelector('.perm-cb[data-menu="' + menu + '"][data-perm="approve"]').checked
+      };
     });
     
     var roleData = {
       'Nama Role': document.getElementById('role-name').value.trim(),
       'Deskripsi': document.getElementById('role-description').value.trim(),
-      'Menu Access': JSON.stringify(menuAccess),
+      'Menu Access': JSON.stringify(permMatrix), // Save as JSON string
       'Status': document.getElementById('role-status').value
     };
     
@@ -379,6 +363,4 @@
       google.script.run.withSuccessHandler(onSuccess).createRole(roleData);
     }
   }
-
-  console.log('=== setup-role.html script loaded ===');
 </script>
